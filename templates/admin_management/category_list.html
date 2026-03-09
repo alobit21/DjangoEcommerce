@@ -17,8 +17,8 @@
         </div>
     </div>
     <div class="col-md-6">
-        <form method="GET" class="d-flex gap-2">
-            <input type="text" name="search" class="form-control" placeholder="Search categories..." value="{{ request.GET.search }}">
+        <form method="GET" class="d-flex gap-2" id="filterForm">
+            <input type="text" name="search" class="form-control" placeholder="Search categories..." value="{{ request.GET.search }}" id="searchInput">
             <button type="submit" class="btn btn-admin btn-outline-primary">
                 <i class="fas fa-search"></i>
             </button>
@@ -225,6 +225,34 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+// Live search functionality
+let searchTimeout;
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    
+    // Live search on input
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                applyFilters();
+            }, 500); // Wait 500ms after user stops typing
+        });
+    }
+});
+
+function applyFilters() {
+    const search = document.getElementById('searchInput').value;
+    
+    // Build URL with current filters
+    const params = new URLSearchParams();
+    
+    if (search) params.append('search', search);
+    
+    // Redirect to filtered page
+    window.location.href = '?' + params.toString();
 }
 </script>
 {% endblock %}

@@ -24,9 +24,9 @@
         </div>
     </div>
     <div class="col-md-6">
-        <form method="GET" class="d-flex gap-2">
-            <input type="text" name="search" class="form-control" placeholder="Search products..." value="{{ request.GET.search }}">
-            <select name="category" class="form-select" style="max-width: 200px;">
+        <form method="GET" class="d-flex gap-2" id="filterForm">
+            <input type="text" name="search" class="form-control" placeholder="Search products..." value="{{ request.GET.search }}" id="searchInput">
+            <select name="category" class="form-select" style="max-width: 200px;" id="categorySelect">
                 <option value="">All Categories</option>
                 {% for category in categories %}
                 <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
@@ -34,7 +34,7 @@
                 </option>
                 {% endfor %}
             </select>
-            <select name="stock_status" class="form-select" style="max-width: 150px;">
+            <select name="stock_status" class="form-select" style="max-width: 150px;" id="stockStatusSelect">
                 <option value="">All Stock</option>
                 <option value="in_stock" {% if request.GET.stock_status == 'in_stock' %}selected{% endif %}>In Stock</option>
                 <option value="low_stock" {% if request.GET.stock_status == 'low_stock' %}selected{% endif %}>Low Stock</option>
@@ -446,6 +446,49 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+// Live search functionality
+let searchTimeout;
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const categorySelect = document.getElementById('categorySelect');
+    const stockStatusSelect = document.getElementById('stockStatusSelect');
+    
+    // Live search on input
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                applyFilters();
+            }, 500); // Wait 500ms after user stops typing
+        });
+    }
+    
+    // Apply filters on change
+    if (categorySelect) {
+        categorySelect.addEventListener('change', applyFilters);
+    }
+    
+    if (stockStatusSelect) {
+        stockStatusSelect.addEventListener('change', applyFilters);
+    }
+});
+
+function applyFilters() {
+    const search = document.getElementById('searchInput').value;
+    const category = document.getElementById('categorySelect').value;
+    const stockStatus = document.getElementById('stockStatusSelect').value;
+    
+    // Build URL with current filters
+    const params = new URLSearchParams();
+    
+    if (search) params.append('search', search);
+    if (category) params.append('category', category);
+    if (stockStatus) params.append('stock_status', stockStatus);
+    
+    // Redirect to filtered page
+    window.location.href = '?' + params.toString();
 }
 </script>
 {% endblock %}

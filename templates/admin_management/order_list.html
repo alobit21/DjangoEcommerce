@@ -24,9 +24,9 @@
         </div>
     </div>
     <div class="col-md-6">
-        <form method="GET" class="d-flex gap-2">
-            <input type="text" name="search" class="form-control" placeholder="Search orders..." value="{{ request.GET.search }}">
-            <select name="status" class="form-select" style="max-width: 150px;">
+        <form method="GET" class="d-flex gap-2" id="filterForm">
+            <input type="text" name="search" class="form-control" placeholder="Search orders..." value="{{ request.GET.search }}" id="searchInput">
+            <select name="status" class="form-select" style="max-width: 150px;" id="statusSelect">
                 <option value="">All Status</option>
                 <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
                 <option value="processing" {% if request.GET.status == 'processing' %}selected{% endif %}>Processing</option>
@@ -34,8 +34,8 @@
                 <option value="delivered" {% if request.GET.status == 'delivered' %}selected{% endif %}>Delivered</option>
                 <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
             </select>
-            <input type="date" name="date_from" class="form-control" style="max-width: 150px;" value="{{ request.GET.date_from }}" placeholder="From">
-            <input type="date" name="date_to" class="form-control" style="max-width: 150px;" value="{{ request.GET.date_to }}" placeholder="To">
+            <input type="date" name="date_from" class="form-control" style="max-width: 150px;" value="{{ request.GET.date_from }}" placeholder="From" id="dateFrom">
+            <input type="date" name="date_to" class="form-control" style="max-width: 150px;" value="{{ request.GET.date_to }}" placeholder="To" id="dateTo">
             <button type="submit" class="btn btn-admin btn-outline-primary">
                 <i class="fas fa-search"></i>
             </button>
@@ -396,6 +396,56 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+// Live search functionality
+let searchTimeout;
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const statusSelect = document.getElementById('statusSelect');
+    const dateFrom = document.getElementById('dateFrom');
+    const dateTo = document.getElementById('dateTo');
+    
+    // Live search on input
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                applyFilters();
+            }, 500); // Wait 500ms after user stops typing
+        });
+    }
+    
+    // Apply filters on change
+    if (statusSelect) {
+        statusSelect.addEventListener('change', applyFilters);
+    }
+    
+    if (dateFrom) {
+        dateFrom.addEventListener('change', applyFilters);
+    }
+    
+    if (dateTo) {
+        dateTo.addEventListener('change', applyFilters);
+    }
+});
+
+function applyFilters() {
+    const search = document.getElementById('searchInput').value;
+    const status = document.getElementById('statusSelect').value;
+    const dateFrom = document.getElementById('dateFrom').value;
+    const dateTo = document.getElementById('dateTo').value;
+    
+    // Build URL with current filters
+    const params = new URLSearchParams();
+    
+    if (search) params.append('search', search);
+    if (status) params.append('status', status);
+    if (dateFrom) params.append('date_from', dateFrom);
+    if (dateTo) params.append('date_to', dateTo);
+    
+    // Redirect to filtered page
+    window.location.href = '?' + params.toString();
 }
 </script>
 {% endblock %}
