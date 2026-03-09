@@ -70,6 +70,7 @@ def admin_product_add(request):
         category_id = request.POST.get('category')
         stock_quantity = request.POST.get('stock_quantity', 0)
         reorder_level = request.POST.get('reorder_level', 10)
+        image = request.FILES.get('image')
         
         try:
             # Create product
@@ -77,8 +78,14 @@ def admin_product_add(request):
                 name=name,
                 description=description,
                 price=float(price),
-                category_id=category_id
+                category_id=category_id,
+                image=image
             )
+            
+            # Create thumbnail if image is provided
+            if image:
+                product.make_thumbnail(image)
+                product.save()
             
             # Create stock record
             Stock.objects.create(
@@ -113,6 +120,7 @@ def admin_product_edit(request, product_id):
         category_id = request.POST.get('category')
         stock_quantity = request.POST.get('stock_quantity', 0)
         reorder_level = request.POST.get('reorder_level', 10)
+        image = request.FILES.get('image')
         
         try:
             # Update product
@@ -120,6 +128,12 @@ def admin_product_edit(request, product_id):
             product.description = description
             product.price = float(price)
             product.category_id = category_id
+            
+            # Update image if new one is provided
+            if image:
+                product.image = image
+                product.make_thumbnail(image)
+            
             product.save()
             
             # Update stock
