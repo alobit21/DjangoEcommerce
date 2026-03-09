@@ -11,12 +11,17 @@ class Cart(object):
         self.cart = cart
 
     def __iter__(self):
-        for p in self.cart.keys():
-            self.cart[str(p)]['product'] = Product.objects.get(pk=p)
+        # Create a copy of cart items with product objects for iteration
+        cart_items = []
+        for product_id in self.cart.keys():
+            product = Product.objects.get(pk=product_id)
+            cart_item = self.cart[str(product_id)].copy()
+            cart_item['product'] = product
+            cart_item['total_price'] = int(product.price * cart_item['quantity']) / 100
+            cart_items.append(cart_item)
         
-        for item in self.cart.values():
-            item['total_price'] = int(item['product'].price * item['quantity']) / 100
-            yield item  # Ensure to yield products
+        for item in cart_items:
+            yield item
 
     def __len__(self):
         return sum(item['quantity'] for item in self.cart.values())
@@ -47,7 +52,8 @@ class Cart(object):
             self.save()
 
     def get_total_cost(self):
-        for p in self.cart.keys():
-            self.cart[str(p)]['product'] = Product.objects.get(pk=p)
-
-        return sum(item['product'].price * item['quantity'] for item in self.cart.values())
+        total_cost = 0
+        for product_id in self.cart.keys():
+            product = Product.objects.get(pk=product_id)
+            total_cost += product.price * self.cart[str(product_id)]['quantity']
+        return total_cost
