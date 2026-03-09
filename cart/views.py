@@ -8,8 +8,16 @@ from .cart import Cart
 def add_to_cart(request, product_id):
     cart = Cart(request)
     cart.add(product_id)
-    messages.success(request, 'Item added to cart!')
-    return redirect('cart')  # Replace 'cart' with the appropriate URL name for your cart view.
+    
+    if request.htmx:
+        # Return the updated cart button HTML for HTMX
+        from django.template.loader import render_to_string
+        cart_html = render_to_string('cart/menu_cart.html', {'cart': cart}, request=request)
+        return cart_html
+    else:
+        # Fallback for non-HTMX requests
+        messages.success(request, 'Item added to cart!')
+        return redirect('cart')
 
 def cart(request):
     cart = Cart(request)
