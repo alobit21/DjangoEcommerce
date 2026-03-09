@@ -29,7 +29,8 @@ class Product(models.Model):
         return self.name
     
     def get_display_price(self):
-        return "${:,.2f}".format(self.price)
+        tsh_price = self.price * 2500  # Convert USD to TSH
+        return "TSH {:,.2f}".format(tsh_price)
 
     def get_thumbnail(self):
         if self.thumbnail:
