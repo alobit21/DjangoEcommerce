@@ -367,6 +367,55 @@ def admin_category_list(request):
 
 @login_required
 @user_passes_test(is_admin)
+def admin_category_add(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            name = data.get('name')
+            slug = data.get('slug')
+            
+            if not name or not slug:
+                return JsonResponse({'success': False, 'message': 'Name and slug are required'}, status=400)
+            
+            category = Category.objects.create(
+                name=name,
+                slug=slug
+            )
+            return JsonResponse({'success': True, 'message': 'Category added successfully'})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_category_update(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            name = data.get('name')
+            slug = data.get('slug')
+            
+            if not name or not slug:
+                return JsonResponse({'success': False, 'message': 'Name and slug are required'}, status=400)
+            
+            category.name = name
+            category.slug = slug
+            category.save()
+            return JsonResponse({'success': True, 'message': 'Category updated successfully'})
+        except json.JSONDecodeError:
+            return JsonResponse({'success': False, 'message': 'Invalid JSON data'}, status=400)
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+
+@login_required
+@user_passes_test(is_admin)
 def admin_user_list(request):
     search = request.GET.get('search', '')
     
