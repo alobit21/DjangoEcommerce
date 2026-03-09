@@ -129,7 +129,7 @@
                     </td>
                     <td>
                         <strong>TSH {{ order.total_amount|floatformat:0 }}</strong><br>
-                        <small class="text-muted">${{ order.total_amount|div:2500|floatformat:2 }}</small>
+                        <small class="text-muted">${% widthratio order.total_amount 1 2500 %}</small>
                     </td>
                     <td>
                         <span class="status-badge status-{{ order.status }}">

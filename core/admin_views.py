@@ -8,6 +8,7 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 from datetime import timedelta
 import json
+from django.contrib import messages
 
 from products.models import Product, Category
 from .models import Order, OrderItem, Stock, StockTransaction, UserProfile
@@ -58,6 +59,183 @@ def admin_product_list(request):
     }
     
     return render(request, 'admin_management/product_list.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_product_add(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        price = request.POST.get('price')
+        category_id = request.POST.get('category')
+        stock_quantity = request.POST.get('stock_quantity', 0)
+        reorder_level = request.POST.get('reorder_level', 10)
+        
+        try:
+            # Create product
+            product = Product.objects.create(
+                name=name,
+                description=description,
+                price=float(price),
+                category_id=category_id
+            )
+            
+            # Create stock record
+            Stock.objects.create(
+                product=product,
+                quantity=int(stock_quantity),
+                reorder_level=int(reorder_level)
+            )
+            
+            messages.success(request, f'Product "{name}" added successfully!')
+            return redirect('admin_product_list')
+            
+        except Exception as e:
+            messages.error(request, f'Error adding product: {str(e)}')
+    
+    categories = Category.objects.all()
+    context = {
+        'categories': categories,
+        'title': 'Add Product'
+    }
+    return render(request, 'admin_management/product_form.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_product_edit(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    stock = get_object_or_404(Stock, product=product)
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        price = request.POST.get('price')
+        category_id = request.POST.get('category')
+        stock_quantity = request.POST.get('stock_quantity', 0)
+        reorder_level = request.POST.get('reorder_level', 10)
+        
+        try:
+            # Update product
+            product.name = name
+            product.description = description
+            product.price = float(price)
+            product.category_id = category_id
+            product.save()
+            
+            # Update stock
+            stock.quantity = int(stock_quantity)
+            stock.reorder_level = int(reorder_level)
+            stock.save()
+            
+            messages.success(request, f'Product "{name}" updated successfully!')
+            return redirect('admin_product_list')
+            
+        except Exception as e:
+            messages.error(request, f'Error updating product: {str(e)}')
+    
+    categories = Category.objects.all()
+    context = {
+        'product': product,
+        'stock': stock,
+        'categories': categories,
+        'title': 'Edit Product'
+    }
+    return render(request, 'admin_management/product_form.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_product_detail(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    stock = get_object_or_404(Stock, product=product)
+    
+    # Get sales data for this product
+    sales_data = OrderItem.objects.filter(
+        product=product,
+        order__status__in=['processing', 'shipped', 'delivered']
+    ).aggregate(
+        total_sold=Sum('quantity'),
+        total_revenue=Sum('price'),
+        recent_orders=Count('order')
+    )
+    
+    # Recent orders containing this product
+    recent_orders = OrderItem.objects.filter(
+        product=product
+    ).select_related('order', 'order__user').order_by('-order__created_at')[:10]
+    
+    context = {
+        'product': product,
+        'stock': stock,
+        'sales_data': sales_data,
+        'recent_orders': recent_orders,
+        'title': f'Product Details - {product.name}'
+    }
+    
+    return render(request, 'admin_management/product_detail.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_product_export(request):
+    import csv
+    from django.http import HttpResponse
+    
+    # Get products with filters applied
+    search = request.GET.get('search', '')
+    category_id = request.GET.get('category', '')
+    stock_status = request.GET.get('stock_status', '')
+    
+    products = Product.objects.select_related('category', 'stock').all()
+    
+    if search:
+        products = products.filter(
+            Q(name__icontains=search) | 
+            Q(description__icontains=search) |
+            Q(category__name__icontains=search)
+        )
+    
+    if category_id:
+        products = products.filter(category_id=category_id)
+    
+    if stock_status:
+        if stock_status == 'in_stock':
+            products = products.filter(stock__quantity__gt=F('stock__reorder_level'))
+        elif stock_status == 'low_stock':
+            products = products.filter(stock__quantity__lte=F('stock__reorder_level'), stock__quantity__gt=0)
+        elif stock_status == 'out_of_stock':
+            products = products.filter(stock__quantity=0)
+    
+    # Create CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="products_export.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow([
+        'ID', 'Name', 'Description', 'Category', 'Price (TSH)', 
+        'Stock Quantity', 'Reorder Level', 'Status', 'Created Date'
+    ])
+    
+    for product in products:
+        stock = product.stock
+        if stock.quantity == 0:
+            status = 'Out of Stock'
+        elif stock.quantity <= stock.reorder_level:
+            status = 'Low Stock'
+        else:
+            status = 'In Stock'
+            
+        writer.writerow([
+            product.id,
+            product.name,
+            product.description,
+            product.category.name if product.category else '',
+            product.price,
+            stock.quantity,
+            stock.reorder_level,
+            status,
+            product.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        ])
+    
+    return response
 
 @login_required
 @user_passes_test(is_admin)
@@ -159,6 +337,10 @@ def admin_stock_list(request):
     low_stock_items = Stock.objects.filter(
         quantity__lte=F('reorder_level')
     ).select_related('product')[:10]
+    
+    # Add needed stock calculation to each stock item
+    for stock in low_stock_items:
+        stock.needed_stock = max(0, (stock.reorder_level + 10) - stock.quantity)
     
     context = {
         'stocks': page_obj,
@@ -321,6 +503,10 @@ def admin_reports(request):
     # Order status breakdown
     order_status_data = orders.values('status').annotate(count=Count('id'))
     
+    # Extract labels and counts for chart
+    order_status_labels = [item['status'] for item in order_status_data]
+    order_status_counts = [item['count'] for item in order_status_data]
+    
     # Daily sales
     daily_sales = []
     dates = []
@@ -342,6 +528,8 @@ def admin_reports(request):
         'sales_by_category': sales_by_category,
         'top_products': top_products,
         'order_status_data': order_status_data,
+        'order_status_labels': order_status_labels,
+        'order_status_counts': order_status_counts,
         'daily_sales': daily_sales,
         'dates': dates,
     }

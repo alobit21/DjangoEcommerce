@@ -220,7 +220,7 @@
                                 <td>{{ stock.reorder_level }}</td>
                                 <td>
                                     <span class="badge bg-warning">
-                                        {{ stock.reorder_level|add:10|sub:stock.quantity }}
+                                        {{ stock.needed_stock }}
                                     </span>
                                 </td>
                                 <td>

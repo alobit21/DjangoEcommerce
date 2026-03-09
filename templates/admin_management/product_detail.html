@@ -1,0 +1,289 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Product Details -->
+    <div class="col-lg-8">
+        <div class="admin-form mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Product Information</h5>
+                <div class="btn-group btn-group-sm">
+                    <a href="{% url 'admin_product_edit' product.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'admin_product_list' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to List
+                    </a>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="rounded img-fluid mb-3" style="object-fit: cover; height: 200px;">
+                    {% else %}
+                        <div class="rounded bg-secondary d-flex align-items-center justify-content-center mb-3" style="height: 200px;">
+                            <i class="fas fa-image text-white fa-3x"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <h4>{{ product.name }}</h4>
+                    <p class="text-muted">{{ product.category.name }}</p>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Price:</strong> TSH {{ product.price|floatformat:0 }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Created:</strong> {{ product.created_at|date:"M d, Y" }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <strong>Description:</strong><br>
+                        {{ product.description|default:"No description available" }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        {% if stock.quantity == 0 %}
+                            <span class="badge bg-danger">Out of Stock</span>
+                        {% elif stock.quantity <= stock.reorder_level %}
+                            <span class="badge bg-warning">Low Stock ({{ stock.quantity }})</span>
+                        {% else %}
+                            <span class="badge bg-success">In Stock ({{ stock.quantity }})</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sales Information -->
+        <div class="admin-form mb-4">
+            <h5 class="mb-3">Sales Information</h5>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-card text-center">
+                        <div class="stat-number">{{ sales_data.total_sold|default:0 }}</div>
+                        <div class="stat-label">Total Sold</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card text-center">
+                        <div class="stat-number">TSH {{ sales_data.total_revenue|default:0|floatformat:0 }}</div>
+                        <div class="stat-label">Total Revenue</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card text-center">
+                        <div class="stat-number">{{ sales_data.recent_orders|default:0 }}</div>
+                        <div class="stat-label">Recent Orders</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Orders -->
+        <div class="admin-form">
+            <h5 class="mb-3">Recent Orders</h5>
+            {% if recent_orders %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in recent_orders %}
+                            <tr>
+                                <td><strong>{{ item.order.order_number }}</strong></td>
+                                <td>{{ item.order.user.username }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>TSH {{ item.price|floatformat:0 }}</td>
+                                <td>{{ item.order.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="status-badge status-{{ item.order.status }}">
+                                        {{ item.order.status|title }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-muted text-center">No recent orders for this product</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Stock Management -->
+        <div class="admin-form mb-4">
+            <h5 class="mb-3">Stock Management</h5>
+            <div class="mb-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Current Stock:</span>
+                    <strong>{{ stock.quantity }}</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Reorder Level:</span>
+                    <strong>{{ stock.reorder_level }}</strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Status:</span>
+                    <strong>
+                        {% if stock.quantity == 0 %}
+                            Out of Stock
+                        {% elif stock.quantity <= stock.reorder_level %}
+                            Low Stock
+                        {% else %}
+                            In Stock
+                        {% endif %}
+                    </strong>
+                </div>
+            </div>
+            <button class="btn btn-admin btn-primary w-100" onclick="quickStockUpdate()">
+                <i class="fas fa-warehouse"></i> Update Stock
+            </button>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="admin-form mb-4">
+            <h5 class="mb-3">Quick Actions</h5>
+            <div class="d-grid gap-2">
+                <a href="{% url 'admin_product_edit' product.id %}" class="btn btn-outline-primary">
+                    <i class="fas fa-edit"></i> Edit Product
+                </a>
+                <a href="{% if product.slug %}{% url 'product_detail' product.slug %}{% else %}#{% endif %}" class="btn btn-outline-info" target="_blank">
+                    <i class="fas fa-external-link-alt"></i> View on Store
+                </a>
+                <button class="btn btn-outline-success" onclick="duplicateProduct()">
+                    <i class="fas fa-copy"></i> Duplicate Product
+                </button>
+            </div>
+        </div>
+        
+        <!-- Product Statistics -->
+        <div class="admin-form">
+            <h5 class="mb-3">Product Statistics</h5>
+            <div class="small text-muted">
+                <div class="mb-2">
+                    <i class="fas fa-calendar"></i> Created: {{ product.created_at|date:"M d, Y H:i" }}
+                </div>
+                {% if product.updated_at %}
+                <div class="mb-2">
+                    <i class="fas fa-edit"></i> Updated: {{ product.updated_at|date:"M d, Y H:i" }}
+                </div>
+                {% endif %}
+                <div class="mb-2">
+                    <i class="fas fa-tag"></i> Category: {{ product.category.name }}
+                </div>
+                <div class="mb-2">
+                    <i class="fas fa-money-bill"></i> Price: TSH {{ product.price|floatformat:0 }}
+                </div>
+                <div>
+                    <i class="fas fa-box"></i> Stock: {{ stock.quantity }} / {{ stock.reorder_level }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function quickStockUpdate() {
+    const currentStock = {{ stock.quantity }};
+    const newStock = prompt(`Current stock: ${currentStock}\nEnter new stock quantity:`, currentStock);
+    
+    if (newStock !== null && !isNaN(newStock)) {
+        showLoading();
+        fetch(`/admin/stock/{{ stock.id }}/update/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ 
+                quantity: parseInt(newStock) - currentStock,
+                transaction_type: parseInt(newStock) > currentStock ? 'in' : 'out',
+                reason: 'Manual stock update'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            alert('Error updating stock');
+        });
+    }
+}
+
+function duplicateProduct() {
+    if (confirm('Create a duplicate of this product?')) {
+        showLoading();
+        fetch(`/admin/products/add/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: new URLSearchParams({
+                'name': '{{ product.name }} (Copy)',
+                'description': '{{ product.description }}',
+                'price': '{{ product.price }}',
+                'category': '{{ product.category.id }}',
+                'stock_quantity': '0',
+                'reorder_level': '{{ stock.reorder_level }}'
+            })
+        })
+        .then(response => {
+            if (response.redirected) {
+                hideLoading();
+                window.location.href = response.url;
+            } else {
+                return response.text();
+            }
+        })
+        .catch(error => {
+            hideLoading();
+            alert('Error duplicating product');
+        });
+    }
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

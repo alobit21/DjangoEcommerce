@@ -14,7 +14,9 @@ urlpatterns = [
     # Admin management URLs
     path('admin/products/', admin_views.admin_product_list, name='admin_product_list'),
     path('admin/products/add/', admin_views.admin_product_add, name='admin_product_add'),
+    path('admin/products/<int:product_id>/', admin_views.admin_product_detail, name='admin_product_detail'),
     path('admin/products/<int:product_id>/edit/', admin_views.admin_product_edit, name='admin_product_edit'),
+    path('admin/products/export/', admin_views.admin_product_export, name='admin_product_export'),
     path('admin/orders/', admin_views.admin_order_list, name='admin_order_list'),
     path('admin/stock/', admin_views.admin_stock_list, name='admin_stock_list'),
     path('admin/categories/', admin_views.admin_category_list, name='admin_category_list'),

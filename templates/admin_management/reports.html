@@ -50,7 +50,7 @@
     </div>
     <div class="col-md-3">
         <div class="stat-card">
-            <div class="stat-number">TSH {{ total_revenue|div:total_orders|default:0|floatformat:0 }}</div>
+            <div class="stat-number">TSH {% widthratio total_revenue total_orders 1 %}</div>
             <div class="stat-label">Average Order Value</div>
         </div>
     </div>
@@ -154,74 +154,133 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-// Sales Chart
-const salesCtx = document.getElementById('salesChart').getContext('2d');
-const salesChart = new Chart(salesCtx, {
-    type: 'line',
-    data: {
-        labels: {{ dates|safe }},
-        datasets: [{
-            label: 'Daily Sales (TSH)',
-            data: {{ daily_sales|safe }},
-            borderColor: '#3498db',
-            backgroundColor: 'rgba(52, 152, 219, 0.1)',
-            tension: 0.4,
-            fill: true
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                display: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                ticks: {
-                    callback: function(value) {
-                        return 'TSH ' + value.toLocaleString();
+ <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* ---------- SALES CHART ---------- */
+
+    const salesCanvas = document.getElementById("salesChart");
+
+    if (salesCanvas) {
+
+        // Force fixed height to prevent stretching
+        salesCanvas.style.height = "300px";
+
+        const salesLabels = {{ dates|safe }} || [];
+        const salesData = {{ daily_sales|safe }} || [];
+
+        new Chart(salesCanvas, {
+            type: "line",
+            data: {
+                labels: salesLabels,
+                datasets: [{
+                    label: "Daily Sales (TSH)",
+                    data: salesData,
+                    borderColor: "#3498db",
+                    backgroundColor: "rgba(52,152,219,0.15)",
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointBackgroundColor: "#3498db",
+                    tension: 0.35,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return "TSH " + context.raw.toLocaleString();
+                            }
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: "#f0f0f0"
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return "TSH " + value.toLocaleString();
+                            }
+                        }
                     }
                 }
             }
-        }
+        });
     }
+
+
+    /* ---------- ORDER STATUS CHART ---------- */
+
+    const statusCanvas = document.getElementById("statusChart");
+
+    if (statusCanvas) {
+
+        statusCanvas.style.height = "260px";
+
+        const statusLabels = {{ order_status_labels|safe }} || [];
+        const statusData = {{ order_status_counts|safe }} || [];
+
+        new Chart(statusCanvas, {
+            type: "doughnut",
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusData,
+                    backgroundColor: [
+                        "#f39c12",
+                        "#3498db",
+                        "#27ae60",
+                        "#e74c3c",
+                        "#95a5a6"
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ": " + context.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
 });
 
-// Status Chart
-const statusCtx = document.getElementById('statusChart').getContext('2d');
-const statusChart = new Chart(statusCtx, {
-    type: 'doughnut',
-    data: {
-        labels: {{ order_status_data|mapattr:'status'|safe }},
-        datasets: [{
-            data: {{ order_status_data|mapattr:'count'|safe }},
-            backgroundColor: [
-                '#f39c12', // pending
-                '#3498db', // processing
-                '#27ae60', // delivered
-                '#e74c3c', // cancelled
-                '#95a5a6'  // others
-            ]
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'bottom'
-            }
-        }
-    }
-});
+
+/* ---------- EXPORT REPORT ---------- */
 
 function exportReport() {
     const dateFrom = document.querySelector('input[name="date_from"]').value;
     const dateTo = document.querySelector('input[name="date_to"]').value;
+
     window.location.href = `/admin/reports/export/?date_from=${dateFrom}&date_to=${dateTo}`;
 }
 </script>
