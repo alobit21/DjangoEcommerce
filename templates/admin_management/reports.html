@@ -37,27 +37,47 @@
 <!-- Summary Cards -->
 <div class="row mb-4">
     <div class="col-md-3">
-        <div class="stat-card">
+        <div class="stat-card primary">
+            <div class="stat-card-content">
+                <div class="stat-icon primary">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <div class="stat-label">Total Orders</div>
+            </div>
             <div class="stat-number">{{ total_orders }}</div>
-            <div class="stat-label">Total Orders</div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="stat-card">
+        <div class="stat-card success">
+            <div class="stat-card-content">
+                <div class="stat-icon success">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
             <div class="stat-number">TSH {{ total_revenue|floatformat:0 }}</div>
-            <div class="stat-label">Total Revenue</div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="stat-card">
+        <div class="stat-card warning">
+            <div class="stat-card-content">
+                <div class="stat-icon warning">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="stat-label">Average Order Value</div>
+            </div>
             <div class="stat-number">TSH {% widthratio total_revenue total_orders 1 %}</div>
-            <div class="stat-label">Average Order Value</div>
         </div>
     </div>
     <div class="col-md-3">
-        <div class="stat-card">
+        <div class="stat-card danger">
+            <div class="stat-card-content">
+                <div class="stat-icon danger">
+                    <i class="fas fa-calendar"></i>
+                </div>
+                <div class="stat-label">Days in Period</div>
+            </div>
             <div class="stat-number">{{ dates|length }}</div>
-            <div class="stat-label">Days in Period</div>
         </div>
     </div>
 </div>

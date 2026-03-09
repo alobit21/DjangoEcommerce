@@ -46,39 +46,69 @@
 <!-- Statistics Cards -->
 <div class="row mb-4">
     <div class="col-md-2">
-        <div class="stat-card">
+        <div class="stat-card warning">
+            <div class="stat-card-content">
+                <div class="stat-icon warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-label">Pending</div>
+            </div>
             <div class="stat-number">{{ order_stats.pending }}</div>
-            <div class="stat-label">Pending</div>
         </div>
     </div>
     <div class="col-md-2">
-        <div class="stat-card">
+        <div class="stat-card primary">
+            <div class="stat-card-content">
+                <div class="stat-icon primary">
+                    <i class="fas fa-cog"></i>
+                </div>
+                <div class="stat-label">Processing</div>
+            </div>
             <div class="stat-number">{{ order_stats.processing }}</div>
-            <div class="stat-label">Processing</div>
         </div>
     </div>
     <div class="col-md-2">
-        <div class="stat-card">
+        <div class="stat-card info">
+            <div class="stat-card-content">
+                <div class="stat-icon info">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div class="stat-label">Shipped</div>
+            </div>
             <div class="stat-number">{{ order_stats.shipped }}</div>
-            <div class="stat-label">Shipped</div>
         </div>
     </div>
     <div class="col-md-2">
-        <div class="stat-card">
+        <div class="stat-card success">
+            <div class="stat-card-content">
+                <div class="stat-icon success">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="stat-label">Delivered</div>
+            </div>
             <div class="stat-number">{{ order_stats.delivered }}</div>
-            <div class="stat-label">Delivered</div>
         </div>
     </div>
     <div class="col-md-2">
-        <div class="stat-card">
+        <div class="stat-card danger">
+            <div class="stat-card-content">
+                <div class="stat-icon danger">
+                    <i class="fas fa-times"></i>
+                </div>
+                <div class="stat-label">Cancelled</div>
+            </div>
             <div class="stat-number">{{ order_stats.cancelled }}</div>
-            <div class="stat-label">Cancelled</div>
         </div>
     </div>
     <div class="col-md-2">
-        <div class="stat-card">
+        <div class="stat-card primary">
+            <div class="stat-card-content">
+                <div class="stat-icon primary">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-label">Total Revenue</div>
+            </div>
             <div class="stat-number">TSH {{ total_revenue|floatformat:0 }}</div>
-            <div class="stat-label">Total Revenue</div>
         </div>
     </div>
 </div>
