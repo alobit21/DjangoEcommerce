@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 LOGOUT_REDIRECT_URL ='/'
-LOGIN_REDIRECT_URL ='/'
+LOGIN_REDIRECT_URL ='/admin/dashboard/'
 LOGIN_URL = '/login/'
 
 SESSION_COOKIE_AGE = 86400
@@ -75,6 +75,11 @@ TEMPLATES = [
         },
     },
 ]
+
+# Custom admin configuration
+ADMIN_TITLE = 'Ecommerce Admin Portal'
+ADMIN_HEADER = 'Ecommerce Admin'
+ADMIN_INDEX_TITLE = 'Welcome to Ecommerce Admin Portal'
 
 WSGI_APPLICATION = 'ecom.wsgi.application'
 

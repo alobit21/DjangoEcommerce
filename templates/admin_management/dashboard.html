@@ -1,0 +1,374 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card primary">
+            <div class="stat-icon primary">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_orders }}</div>
+            <div class="stat-label">Total Orders</div>
+            <small class="text-muted">
+                <i class="fas fa-arrow-up text-success"></i> 
+                {{ stats.new_orders_today }} today
+            </small>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card success">
+            <div class="stat-icon success">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_products }}</div>
+            <div class="stat-label">Total Products</div>
+            <small class="text-muted">
+                <i class="fas fa-plus text-success"></i> 
+                {{ stats.new_products_this_month }} this month
+            </small>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card warning">
+            <div class="stat-icon warning">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-number">{{ stats.low_stock_products }}</div>
+            <div class="stat-label">Low Stock Items</div>
+            <small class="text-muted">
+                <i class="fas fa-arrow-down text-danger"></i> 
+                Need restocking
+            </small>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card danger">
+            <div class="stat-icon danger">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-number">{{ stats.total_users }}</div>
+            <div class="stat-label">Total Users</div>
+            <small class="text-muted">
+                <i class="fas fa-user-plus text-success"></i> 
+                {{ stats.new_users_this_month }} this month
+            </small>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sales Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="admin-table p-4">
+            <h5 class="mb-3">Sales Overview (Last 7 Days)</h5>
+            <canvas id="salesChart" height="120"></canvas>
+        </div>
+    </div>
+    
+    <!-- Order Status -->
+    <div class="col-lg-4 mb-4">
+        <div class="admin-table p-4">
+            <h5 class="mb-3">Order Status</h5>
+            <canvas id="orderStatusChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Orders -->
+    <div class="col-lg-8 mb-4">
+        <div class="admin-table">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Orders</h5>
+                <a href="{% url 'admin_order_list' %}" class="btn btn-sm btn-admin btn-primary">
+                    View All <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td><strong>{{ order.order_number }}</strong></td>
+                            <td>{{ order.user.username }}</td>
+                            <td>TSH {{ order.total_amount|floatformat:0 }}</td>
+                            <td>
+                                <span class="status-badge status-{{ order.status }}">
+                                    {{ order.status|title }}
+                                </span>
+                            </td>
+                            <td>{{ order.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'admin_order_detail' order.id %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'admin_order_edit' order.id %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-3">No recent orders</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Low Stock Products -->
+    <div class="col-lg-4 mb-4">
+        <div class="admin-table">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Low Stock Alert</h5>
+                <a href="{% url 'admin_stock_list' %}" class="btn btn-sm btn-admin btn-warning">
+                    Manage <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+            <div class="p-3">
+                {% for stock in low_stock_products %}
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                    <div>
+                        <strong>{{ stock.product.name }}</strong><br>
+                        <small class="text-muted">{{ stock.product.category.name }}</small>
+                    </div>
+                    <div class="text-end">
+                        <span class="badge bg-danger">{{ stock.quantity }} left</span><br>
+                        <small class="text-muted">Reorder at {{ stock.reorder_level }}</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">No low stock products</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Top Selling Products -->
+    <div class="col-lg-6 mb-4">
+        <div class="admin-table">
+            <div class="p-3 border-bottom">
+                <h5 class="mb-0">Top Selling Products</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Sold</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in top_products %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" 
+                                             class="rounded me-2" width="40" height="40" style="object-fit: cover;"
+                                             onerror="this.src='/static/img/no-image.png'">
+                                    {% else %}
+                                        <div class="rounded me-2 bg-secondary d-flex align-items-center justify-content-center" 
+                                             style="width: 40px; height: 40px;">
+                                            <i class="fas fa-image text-white"></i>
+                                        </div>
+                                    {% endif %}
+                                    <strong>{{ product.name }}</strong>
+                                </div>
+                            </td>
+                            <td>{{ product.category.name }}</td>
+                            <td>{{ product.total_sold }}</td>
+                            <td>TSH {{ product.revenue|floatformat:0 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center py-3">No sales data available</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity -->
+    <div class="col-lg-6 mb-4">
+        <div class="admin-table">
+            <div class="p-3 border-bottom">
+                <h5 class="mb-0">Recent Activity</h5>
+            </div>
+            <div class="p-3">
+                {% for activity in recent_activities %}
+                <div class="d-flex align-items-start mb-3">
+                    <div class="me-3">
+                        <div class="stat-icon" style="width: 40px; height: 40px; font-size: 1rem;">
+                            <i class="fas {{ activity.icon }}"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <strong>{{ activity.title }}</strong><br>
+                        <small class="text-muted">{{ activity.description }}</small><br>
+                        <small class="text-muted">{{ activity.timestamp|timesince }} ago</small>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted text-center">No recent activity</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+ <script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* ---------------- SALES CHART ---------------- */
+
+    const salesCanvas = document.getElementById("salesChart");
+
+    if (salesCanvas) {
+
+        // Force fixed height to stop stretching
+        salesCanvas.style.height = "300px";
+
+        const salesLabels = {{ sales_chart.labels|safe }} || [];
+        const salesData = {{ sales_chart.data|safe }} || [];
+
+        new Chart(salesCanvas, {
+            type: "line",
+            data: {
+                labels: salesLabels,
+                datasets: [{
+                    label: "Daily Sales (TSH)",
+                    data: salesData,
+                    borderColor: "#3498db",
+                    backgroundColor: "rgba(52,152,219,0.15)",
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointBackgroundColor: "#3498db",
+                    tension: 0.35,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+
+                layout: {
+                    padding: 10
+                },
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return "TSH " + context.raw.toLocaleString();
+                            }
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: "#f1f1f1"
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return "TSH " + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+
+    /* ---------------- ORDER STATUS CHART ---------------- */
+
+    const statusCanvas = document.getElementById("orderStatusChart");
+
+    if (statusCanvas) {
+
+        statusCanvas.style.height = "260px";
+
+        const statusLabels = {{ order_status_chart.labels|safe }} || [];
+        const statusData = {{ order_status_chart.data|safe }} || [];
+
+        new Chart(statusCanvas, {
+            type: "doughnut",
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusData,
+                    backgroundColor: [
+                        "#f39c12",
+                        "#3498db",
+                        "#27ae60",
+                        "#e74c3c",
+                        "#95a5a6"
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ": " + context.raw;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+});
+</script>
+{% endblock %}

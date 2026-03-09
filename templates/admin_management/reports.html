@@ -1,0 +1,228 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Reports{% endblock %}
+
+{% block page_title %}Reports{% endblock %}
+
+{% block content %}
+<!-- Date Filter -->
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="admin-form">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label class="form-label">From Date</label>
+                    <input type="date" name="date_from" class="form-control" value="{{ date_from }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">To Date</label>
+                    <input type="date" name="date_to" class="form-control" value="{{ date_to }}">
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">&nbsp;</label>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-admin btn-primary">
+                            <i class="fas fa-filter"></i> Apply Filter
+                        </button>
+                        <button type="button" class="btn btn-admin btn-secondary" onclick="exportReport()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_orders }}</div>
+            <div class="stat-label">Total Orders</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">TSH {{ total_revenue|floatformat:0 }}</div>
+            <div class="stat-label">Total Revenue</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">TSH {{ total_revenue|div:total_orders|default:0|floatformat:0 }}</div>
+            <div class="stat-label">Average Order Value</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ dates|length }}</div>
+            <div class="stat-label">Days in Period</div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sales Chart -->
+    <div class="col-lg-8 mb-4">
+        <div class="admin-table">
+            <div class="p-4">
+                <h5 class="mb-3">Daily Sales Trend</h5>
+                <canvas id="salesChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Order Status Breakdown -->
+    <div class="col-lg-4 mb-4">
+        <div class="admin-table">
+            <div class="p-4">
+                <h5 class="mb-3">Order Status</h5>
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Sales by Category -->
+    <div class="col-lg-6 mb-4">
+        <div class="admin-table">
+            <div class="p-3 border-bottom">
+                <h5 class="mb-0">Sales by Category</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Quantity</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in sales_by_category %}
+                        <tr>
+                            <td>{{ category.product__category__name|default:"Uncategorized" }}</td>
+                            <td>{{ category.quantity }}</td>
+                            <td>TSH {{ category.total_sales|floatformat:0 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-3">No sales data available</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Top Products -->
+    <div class="col-lg-6 mb-4">
+        <div class="admin-table">
+            <div class="p-3 border-bottom">
+                <h5 class="mb-0">Top Products</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity Sold</th>
+                            <th>Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in top_products %}
+                        <tr>
+                            <td>{{ product.product__name }}</td>
+                            <td>{{ product.total_quantity }}</td>
+                            <td>TSH {{ product.total_revenue|floatformat:0 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center py-3">No sales data available</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Sales Chart
+const salesCtx = document.getElementById('salesChart').getContext('2d');
+const salesChart = new Chart(salesCtx, {
+    type: 'line',
+    data: {
+        labels: {{ dates|safe }},
+        datasets: [{
+            label: 'Daily Sales (TSH)',
+            data: {{ daily_sales|safe }},
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    callback: function(value) {
+                        return 'TSH ' + value.toLocaleString();
+                    }
+                }
+            }
+        }
+    }
+});
+
+// Status Chart
+const statusCtx = document.getElementById('statusChart').getContext('2d');
+const statusChart = new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+        labels: {{ order_status_data|mapattr:'status'|safe }},
+        datasets: [{
+            data: {{ order_status_data|mapattr:'count'|safe }},
+            backgroundColor: [
+                '#f39c12', // pending
+                '#3498db', // processing
+                '#27ae60', // delivered
+                '#e74c3c', // cancelled
+                '#95a5a6'  // others
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }
+});
+
+function exportReport() {
+    const dateFrom = document.querySelector('input[name="date_from"]').value;
+    const dateTo = document.querySelector('input[name="date_to"]').value;
+    window.location.href = `/admin/reports/export/?date_from=${dateFrom}&date_to=${dateTo}`;
+}
+</script>
+{% endblock %}
