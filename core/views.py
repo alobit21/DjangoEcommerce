@@ -130,7 +130,7 @@ def admin_dashboard(request):
         },
         {
             'title': 'Low Stock Alert',
-            'description': f'{low_stock_products} products need restocking',
+            'description': f'{low_stock_count} products need restocking',
             'timestamp': timezone.now(),
             'icon': 'fa-exclamation-triangle'
         }

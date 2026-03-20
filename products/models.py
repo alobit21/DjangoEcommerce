@@ -13,6 +13,8 @@ class Category(models.Model):
     def __str__(self):
         return self.name
     
+from django.utils.text import slugify
+
 class Product(models.Model):
     category = models.ForeignKey(Category, related_name='product', on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
@@ -27,6 +29,11 @@ class Product(models.Model):
         
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
     
     def get_display_price(self):
         tsh_price = self.price * 2500  # Convert USD to TSH
