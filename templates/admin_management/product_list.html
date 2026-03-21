@@ -235,7 +235,7 @@ function quickEditStock(productId) {
     const quantity = prompt('Enter new stock quantity:');
     if (quantity !== null && !isNaN(quantity)) {
         showLoading();
-        fetch(`/admin/products/${productId}/update-stock/`, {
+        fetch(`/dashboard/products/${productId}/update-stock/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -262,7 +262,7 @@ function quickEditStock(productId) {
 function deleteProduct(productId) {
     if (confirm('Are you sure you want to delete this product?')) {
         showLoading();
-        fetch(`/admin/products/${productId}/delete/`, {
+        fetch(`/dashboard/products/${productId}/delete/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')

@@ -13,7 +13,11 @@ from .decorators import redirect_admin_to_dashboard
 @redirect_admin_to_dashboard
 def frontpage(request):
 	products = Product.objects.all()[0:8]
-	return render(request, 'core/frontpage.html',{'products':products})
+	featured_products = Product.objects.filter(is_featured=True)[0:3]
+	return render(request, 'core/frontpage.html', {
+		'products': products,
+		'featured_products': featured_products
+	})
 def signup(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)

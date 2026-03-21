@@ -210,7 +210,7 @@ function quickStockUpdate() {
     
     if (newStock !== null && !isNaN(newStock)) {
         showLoading();
-        fetch(`/admin/stock/{{ stock.id }}/update/`, {
+        fetch(`/dashboard/stock/{{ stock.id }}/update/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -241,7 +241,7 @@ function quickStockUpdate() {
 function duplicateProduct() {
     if (confirm('Create a duplicate of this product?')) {
         showLoading();
-        fetch(`/admin/products/add/`, {
+        fetch(`/dashboard/products/add/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',

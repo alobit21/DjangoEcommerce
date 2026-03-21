@@ -301,7 +301,7 @@ function exportReport() {
     const dateFrom = document.querySelector('input[name="date_from"]').value;
     const dateTo = document.querySelector('input[name="date_to"]').value;
 
-    window.location.href = `/admin/reports/export/?date_from=${dateFrom}&date_to=${dateTo}`;
+    window.location.href = `/dashboard/reports/export/?date_from=${dateFrom}&date_to=${dateTo}`;
 }
 </script>
 {% endblock %}

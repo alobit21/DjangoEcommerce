@@ -134,7 +134,7 @@ function editCategory(categoryId) {
 function deleteCategory(categoryId) {
     if (confirm('Are you sure you want to delete this category? This will also affect all products in this category.')) {
         showLoading();
-        fetch(`/admin/categories/${categoryId}/delete/`, {
+        fetch(`/dashboard/categories/${categoryId}/delete/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
@@ -167,7 +167,7 @@ function saveCategory() {
     
     showLoading();
     
-    const url = currentCategoryId ? `/admin/categories/${currentCategoryId}/update/` : '/admin/categories/add/';
+    const url = currentCategoryId ? `/dashboard/categories/${currentCategoryId}/update/` : '/dashboard/categories/add/';
     const method = 'POST';
     
     fetch(url, {
@@ -197,7 +197,7 @@ function saveCategory() {
 }
 
 function exportCategories() {
-    window.location.href = '/admin/categories/export/';
+    window.location.href = '/dashboard/categories/export/';
 }
 
 // Auto-generate slug from name

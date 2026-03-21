@@ -313,7 +313,7 @@ function updateStock(stockId, quantity, type) {
     const reason = prompt(`Reason for ${type === 'in' ? 'adding' : 'removing'} stock:`);
     if (reason !== null) {
         showLoading();
-        fetch(`/admin/stock/${stockId}/update/`, {
+        fetch(`/dashboard/stock/${stockId}/update/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -348,7 +348,7 @@ function editStock(stockId) {
 
 function viewStockHistory(stockId) {
     showLoading();
-    fetch(`/admin/stock/${stockId}/history/`)
+    fetch(`/dashboard/stock/${stockId}/history/`)
         .then(response => response.text())
         .then(html => {
             hideLoading();
@@ -395,7 +395,7 @@ function bulkUpdateStock(stockIds, quantity, type) {
     const reason = prompt(`Reason for bulk ${type === 'in' ? 'adding' : 'removing'} stock:`);
     if (reason !== null) {
         showLoading();
-        fetch('/admin/stock/bulk-update/', {
+        fetch('/dashboard/stock/bulk-update/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -425,7 +425,7 @@ function bulkUpdateStock(stockIds, quantity, type) {
 }
 
 function exportStockReport() {
-    window.location.href = '/admin/stock/export/';
+    window.location.href = '/dashboard/stock/export/';
 }
 
 // Update bulk actions when checkboxes change

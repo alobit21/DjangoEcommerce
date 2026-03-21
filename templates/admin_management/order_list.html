@@ -324,7 +324,7 @@ function clearSelection() {
 
 function viewOrderDetails(orderId) {
     showLoading();
-    fetch(`/admin/orders/${orderId}/details/`)
+    fetch(`/dashboard/orders/${orderId}/details/`)
         .then(response => response.text())
         .then(html => {
             hideLoading();
@@ -340,7 +340,7 @@ function viewOrderDetails(orderId) {
 function updateOrderStatus(orderId, status) {
     if (confirm(`Are you sure you want to mark this order as ${status}?`)) {
         showLoading();
-        fetch(`/admin/orders/${orderId}/update-status/`, {
+        fetch(`/dashboard/orders/${orderId}/update-status/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -373,7 +373,7 @@ function bulkUpdateStatus(status) {
     
     if (confirm(`Are you sure you want to mark ${selectedIds.length} orders as ${status}?`)) {
         showLoading();
-        fetch('/admin/orders/bulk-update-status/', {
+        fetch('/dashboard/orders/bulk-update-status/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -401,11 +401,11 @@ function bulkUpdateStatus(status) {
 }
 
 function editOrder(orderId) {
-    window.location.href = `/admin/orders/${orderId}/edit/`;
+    window.location.href = `/dashboard/orders/${orderId}/edit/`;
 }
 
 function printOrder(orderId) {
-    window.open(`/admin/orders/${orderId}/print/`, '_blank');
+    window.open(`/dashboard/orders/${orderId}/print/`, '_blank');
 }
 
 // Update bulk actions when checkboxes change

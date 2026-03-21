@@ -162,7 +162,7 @@
 <script>
 function viewUser(userId) {
     showLoading();
-    fetch(`/admin/users/${userId}/details/`)
+    fetch(`/dashboard/users/${userId}/details/`)
         .then(response => response.text())
         .then(html => {
             hideLoading();
@@ -176,13 +176,13 @@ function viewUser(userId) {
 }
 
 function editUser(userId) {
-    window.location.href = `/admin/users/${userId}/edit/`;
+    window.location.href = `/dashboard/users/${userId}/edit/`;
 }
 
 function toggleUserStatus(userId) {
     if (confirm('Are you sure you want to toggle this user\'s status?')) {
         showLoading();
-        fetch(`/admin/users/${userId}/toggle-status/`, {
+        fetch(`/dashboard/users/${userId}/toggle-status/`, {
             method: 'POST',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
@@ -205,11 +205,11 @@ function toggleUserStatus(userId) {
 }
 
 function showAddUserModal() {
-    window.location.href = '/admin/users/add/';
+    window.location.href = '/dashboard/users/add/';
 }
 
 function exportUsers() {
-    window.location.href = '/admin/users/export/';
+    window.location.href = '/dashboard/users/export/';
 }
 
 function getCookie(name) {

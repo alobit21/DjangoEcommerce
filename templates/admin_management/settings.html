@@ -158,7 +158,7 @@ function resetToDefaults() {
 function clearCache() {
     if (confirm('Clear all cache? This may temporarily slow down your site.')) {
         showLoading();
-        fetch('/admin/settings/clear-cache/', {
+        fetch('/dashboard/settings/clear-cache/', {
             method: 'POST',
             headers: {
                 'X-CSRFToken': getCookie('csrftoken')
@@ -183,7 +183,7 @@ function clearCache() {
 function backupDatabase() {
     if (confirm('Create database backup? This may take a few moments.')) {
         showLoading();
-        window.location.href = '/admin/settings/backup/';
+        window.location.href = '/dashboard/settings/backup/';
     }
 }
 
@@ -191,7 +191,7 @@ function testEmail() {
     const email = prompt('Enter email address to test:');
     if (email) {
         showLoading();
-        fetch('/admin/settings/test-email/', {
+        fetch('/dashboard/settings/test-email/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ function testEmail() {
 
 function checkUpdates() {
     showLoading();
-    fetch('/admin/settings/check-updates/', {
+    fetch('/dashboard/settings/check-updates/', {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCookie('csrftoken')
