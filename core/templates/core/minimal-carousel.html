@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Image Carousel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .float-animation {
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        /* Custom zoom effect for transitions */
+        .zoom-in {
+            animation: zoomIn 0.8s ease-out;
+        }
+        
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+    <!-- Minimal Image Carousel Component -->
+    <div class="w-full max-w-4xl mx-auto">
+        <div class="relative bg-white rounded-2xl shadow-2xl overflow-hidden" id="carousel-container">
+            <!-- Carousel Images -->
+            <div class="relative aspect-video md:aspect-[16/9] lg:aspect-[21/9]">
+                <!-- Slide 1 -->
+                <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-100" data-slide="0">
+                    <img src="/media/uploads/shoes1.png" 
+                         alt="Product image 1" 
+                         class="w-full h-full object-cover float-animation">
+                </div>
+                
+                <!-- Slide 2 -->
+                <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0" data-slide="1">
+                    <img src="/media/uploads/shoes3.png" 
+                         alt="Product image 2" 
+                         class="w-full h-full object-cover float-animation">
+                </div>
+                
+                <!-- Slide 3 -->
+                <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0" data-slide="2">
+                    <img src="/media/uploads/Computer.jpeg" 
+                         alt="Product image 3" 
+                         class="w-full h-full object-cover float-animation">
+                </div>
+                
+                <!-- Slide 4 -->
+                <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0" data-slide="3">
+                    <img src="/media/uploads/watch1.jpeg" 
+                         alt="Product image 4" 
+                         class="w-full h-full object-cover float-animation">
+                </div>
+                
+                <!-- Slide 5 -->
+                <div class="absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0" data-slide="4">
+                    <img src="/media/uploads/boot.jpeg" 
+                         alt="Product image 5" 
+                         class="w-full h-full object-cover float-animation">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class MinimalCarousel {
+            constructor(options = {}) {
+                // Configuration
+                this.config = {
+                    delay: options.delay || 4000, // 4 seconds default
+                    transitionDuration: options.transitionDuration || 1000,
+                    pauseOnHover: options.pauseOnHover !== false, // default true
+                    zoomEffect: options.zoomEffect !== false, // default true
+                    ...options
+                };
+                
+                // Elements
+                this.container = document.getElementById('carousel-container');
+                this.slides = this.container.querySelectorAll('[data-slide]');
+                this.currentSlide = 0;
+                this.totalSlides = this.slides.length;
+                this.autoplayInterval = null;
+                this.isPaused = false;
+                
+                this.init();
+            }
+            
+            init() {
+                if (this.slides.length === 0) return;
+                
+                // Add hover listeners if enabled
+                if (this.config.pauseOnHover) {
+                    this.container.addEventListener('mouseenter', () => this.pause());
+                    this.container.addEventListener('mouseleave', () => this.resume());
+                }
+                
+                // Start autoplay
+                this.start();
+            }
+            
+            showSlide(index) {
+                // Hide all slides
+                this.slides.forEach((slide, i) => {
+                    slide.style.opacity = '0';
+                    slide.classList.remove('zoom-in');
+                });
+                
+                // Show current slide
+                const currentSlideElement = this.slides[index];
+                currentSlideElement.style.opacity = '1';
+                
+                // Add zoom effect if enabled
+                if (this.config.zoomEffect) {
+                    currentSlideElement.classList.add('zoom-in');
+                }
+                
+                this.currentSlide = index;
+            }
+            
+            nextSlide() {
+                const nextIndex = (this.currentSlide + 1) % this.totalSlides;
+                this.showSlide(nextIndex);
+            }
+            
+            start() {
+                if (this.autoplayInterval) return;
+                
+                this.autoplayInterval = setInterval(() => {
+                    if (!this.isPaused) {
+                        this.nextSlide();
+                    }
+                }, this.config.delay);
+            }
+            
+            pause() {
+                this.isPaused = true;
+            }
+            
+            resume() {
+                this.isPaused = false;
+            }
+            
+            stop() {
+                if (this.autoplayInterval) {
+                    clearInterval(this.autoplayInterval);
+                    this.autoplayInterval = null;
+                }
+            }
+            
+            // Public methods for external control
+            goToSlide(index) {
+                if (index >= 0 && index < this.totalSlides) {
+                    this.showSlide(index);
+                    this.restart();
+                }
+            }
+            
+            restart() {
+                this.stop();
+                this.start();
+            }
+        }
+        
+        // Initialize carousel when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create carousel with default settings
+            const carousel = new MinimalCarousel({
+                delay: 4000,           // 4 seconds between slides
+                transitionDuration: 1000,  // 1 second transition
+                pauseOnHover: true,       // Pause on mouse hover
+                zoomEffect: true          // Add zoom effect during transitions
+            });
+            
+            // Optional: Make carousel globally accessible for external control
+            window.minimalCarousel = carousel;
+        });
+    </script>
+</body>
+</html>
