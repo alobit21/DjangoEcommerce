@@ -113,16 +113,16 @@
                     <td>{{ product.created_at|date:"M d, Y" }}</td>
                     <td>
                         <div class="btn-group btn-group-sm">
-                            <a href="{% url 'admin_product_detail' product.id %}" class="btn btn-outline-primary" title="View">
+                            <a href="{% url 'admin_product_detail' product.slug %}" class="btn btn-outline-primary" title="View">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a href="{% url 'admin_product_edit' product.id %}" class="btn btn-outline-secondary" title="Edit">
+                            <a href="{% url 'admin_product_edit' product.slug %}" class="btn btn-outline-secondary" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button class="btn btn-outline-success" onclick="quickEditStock({{ product.id }})" title="Edit Stock">
+                            <button class="btn btn-outline-success" onclick="quickEditStock('{{ product.slug }}')" title="Edit Stock">
                                 <i class="fas fa-warehouse"></i>
                             </button>
-                            <button class="btn btn-outline-danger" onclick="deleteProduct({{ product.id }})" title="Delete">
+                            <button class="btn btn-outline-danger" onclick="deleteProduct('{{ product.slug }}')" title="Delete">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>

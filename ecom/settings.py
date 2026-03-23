@@ -31,8 +31,12 @@ DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1','codewithmac3.pythonanywhere.com']
 LOGOUT_REDIRECT_URL ='/'
 # Auth
-LOGIN_REDIRECT_URL ='/dashboard/'
+LOGIN_REDIRECT_URL ='/'
 LOGIN_URL = 'login'
+AUTHENTICATION_BACKENDS = [
+    'core.auth_backends.EmailOrUsernameBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 SESSION_COOKIE_AGE = 86400
 CART_SESSION_ID ='cart'

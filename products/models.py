@@ -2,6 +2,7 @@ from django.db import models
 from PIL import Image
 from io import BytesIO
 from django.core.files import File
+import os
 # Create your models here.
 class Category(models.Model):
     name = models.CharField(max_length=255)
@@ -62,7 +63,13 @@ class Product(models.Model):
         thumb_io = BytesIO()
         img.save(thumb_io, 'JPEG', quality=85)
 
-        thumbnail = File(thumb_io, name=image.name)
+        # Extract just the filename without the uploads/ path
+        if hasattr(image, 'name'):
+            filename = os.path.basename(image.name)
+        else:
+            filename = 'thumbnail.jpg'
+        
+        thumbnail = File(thumb_io, name=filename)
 
         return thumbnail
 

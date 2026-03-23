@@ -84,7 +84,7 @@ def admin_product_add(request):
             
             # Create thumbnail if image is provided
             if image:
-                product.make_thumbnail(image)
+                product.thumbnail = product.make_thumbnail(image)
                 product.save()
             
             # Create stock record
@@ -109,9 +109,10 @@ def admin_product_add(request):
 
 @login_required
 @user_passes_test(is_admin)
-def admin_product_edit(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    stock = get_object_or_404(Stock, product=product)
+def admin_product_edit(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
+    # Get stock or create it if it doesn't exist
+    stock, created = Stock.objects.get_or_create(product=product, defaults={'quantity': 0, 'reorder_level': 10})
     
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -132,7 +133,7 @@ def admin_product_edit(request, product_id):
             # Update image if new one is provided
             if image:
                 product.image = image
-                product.make_thumbnail(image)
+                product.thumbnail = product.make_thumbnail(image)
             
             product.save()
             
@@ -158,9 +159,25 @@ def admin_product_edit(request, product_id):
 
 @login_required
 @user_passes_test(is_admin)
-def admin_product_detail(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    stock = get_object_or_404(Stock, product=product)
+def admin_product_delete(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
+    
+    if request.method == 'POST':
+        try:
+            product_name = product.name
+            product.delete()
+            return JsonResponse({'success': True, 'message': f'Product "{product_name}" deleted successfully'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_product_detail(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
+    # Get stock or create it if it doesn't exist
+    stock, created = Stock.objects.get_or_create(product=product, defaults={'quantity': 0, 'reorder_level': 10})
     
     # Get sales data for this product
     sales_data = OrderItem.objects.filter(
@@ -430,6 +447,28 @@ def admin_category_update(request, category_id):
 
 @login_required
 @user_passes_test(is_admin)
+def admin_category_delete(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    
+    if request.method == 'POST':
+        try:
+            # Check if category has products
+            product_count = category.product.count()
+            if product_count > 0:
+                return JsonResponse({
+                    'success': False, 
+                    'message': f'Cannot delete category "{category.name}" because it contains {product_count} products. Please move or delete the products first.'
+                }, status=400)
+            
+            category.delete()
+            return JsonResponse({'success': True, 'message': 'Category deleted successfully'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request method'}, status=400)
+
+@login_required
+@user_passes_test(is_admin)
 def admin_user_list(request):
     search = request.GET.get('search', '')
     
@@ -460,6 +499,45 @@ def admin_user_list(request):
 @user_passes_test(is_admin)
 def update_stock(request, stock_id):
     stock = get_object_or_404(Stock, id=stock_id)
+    
+    try:
+        data = json.loads(request.body)
+        quantity = data.get('quantity', 0)
+        transaction_type = data.get('transaction_type', 'adjustment')
+        reason = data.get('reason', '')
+        
+        # Update stock
+        old_quantity = stock.quantity
+        stock.quantity += quantity
+        stock.save()
+        
+        # Create transaction record
+        StockTransaction.objects.create(
+            stock=stock,
+            transaction_type=transaction_type,
+            quantity=abs(quantity),
+            reason=reason,
+            created_by=request.user
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Stock updated successfully. New quantity: {stock.quantity}'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': str(e)
+        }, status=400)
+
+@require_POST
+@login_required
+@user_passes_test(is_admin)
+def update_stock_by_slug(request, product_slug):
+    product = get_object_or_404(Product, slug=product_slug)
+    # Get stock or create it if it doesn't exist
+    stock, created = Stock.objects.get_or_create(product=product, defaults={'quantity': 0, 'reorder_level': 10})
     
     try:
         data = json.loads(request.body)
