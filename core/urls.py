@@ -3,7 +3,7 @@ from core import views  # Import your own views
 from django.contrib.auth import views as auth_views  # Rename import to avoid conflict
 
 urlpatterns = [
-    path('', views.frontpage, name="home"),  # Added 'home' alias
+    
     path('', views.frontpage, name="frontpage"),
     path('shop/', views.shop, name="shop"),
     path('signup/', views.signup, name="signup"),

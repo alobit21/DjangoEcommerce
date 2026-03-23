@@ -12,8 +12,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -23,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-%y(8xkep6ze24o&bq3b(@&s-inzz!v!ko3ixo9@2u26ubh6a0x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['codewithmac3.pythonanywhere.com']
 LOGOUT_REDIRECT_URL ='/'
 # Auth
 LOGIN_REDIRECT_URL ='/dashboard/'
@@ -133,7 +136,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 MEDIA_URL ='/media/'
 MEDIA_ROOT = BASE_DIR /'media/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
