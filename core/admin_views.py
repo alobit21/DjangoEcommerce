@@ -70,6 +70,7 @@ def admin_product_add(request):
         category_id = request.POST.get('category')
         stock_quantity = request.POST.get('stock_quantity', 0)
         reorder_level = request.POST.get('reorder_level', 10)
+        is_featured = request.POST.get('is_featured') == 'on'  # Checkbox handling
         image = request.FILES.get('image')
         
         try:
@@ -79,7 +80,8 @@ def admin_product_add(request):
                 description=description,
                 price=float(price),
                 category_id=category_id,
-                image=image
+                image=image,
+                is_featured=is_featured
             )
             
             # Create thumbnail if image is provided
@@ -121,6 +123,7 @@ def admin_product_edit(request, product_slug):
         category_id = request.POST.get('category')
         stock_quantity = request.POST.get('stock_quantity', 0)
         reorder_level = request.POST.get('reorder_level', 10)
+        is_featured = request.POST.get('is_featured') == 'on'  # Checkbox handling
         image = request.FILES.get('image')
         
         try:
@@ -129,6 +132,7 @@ def admin_product_edit(request, product_slug):
             product.description = description
             product.price = float(price)
             product.category_id = category_id
+            product.is_featured = is_featured
             
             # Update image if new one is provided
             if image:

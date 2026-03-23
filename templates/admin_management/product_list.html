@@ -59,6 +59,7 @@
                     <th>Price</th>
                     <th>Stock</th>
                     <th>Status</th>
+                    <th>Featured</th>
                     <th>Created</th>
                     <th>Actions</th>
                 </tr>
@@ -108,6 +109,13 @@
                             {% endif %}
                         {% else %}
                             <span class="status-badge status-pending">Unknown</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if product.is_featured %}
+                            <span class="status-badge status-delivered">Featured</span>
+                        {% else %}
+                            <span class="status-badge status-pending">Regular</span>
                         {% endif %}
                     </td>
                     <td>{{ product.created_at|date:"M d, Y" }}</td>
