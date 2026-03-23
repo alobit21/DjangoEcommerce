@@ -57,7 +57,7 @@ def cart(request):
     for item in cart:
         print(item)  # Consider logging instead of printing for production
 
-    return render(request, 'cart/cart.html')
+    return render(request, 'cart/cart.html', {'cart': cart})
 
 @login_required
 def checkout(request):

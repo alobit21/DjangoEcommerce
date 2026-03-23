@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-%y(8xkep6ze24o&bq3b(@&s-inzz!v!ko3ixo9@2u26ubh6a0x
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','codewithmac3.pythonanywhere.com']
+ALLOWED_HOSTS = ['127.0.0.1','localhost','codewithmac3.pythonanywhere.com']
 LOGOUT_REDIRECT_URL ='/'
 # Auth
 LOGIN_REDIRECT_URL ='/'
@@ -79,7 +79,8 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',  # ✅ CORRECT                'cart.context_processors.cart',
+                'django.contrib.messages.context_processors.messages',  # ✅ CORRECT
+                'cart.context_processors.cart',
             ],
         },
     },
