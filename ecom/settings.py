@@ -26,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-%y(8xkep6ze24o&bq3b(@&s-inzz!v!ko3ixo9@2u26ubh6a0x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['codewithmac3.pythonanywhere.com']
+ALLOWED_HOSTS = ['127.0.0.1','codewithmac3.pythonanywhere.com']
 LOGOUT_REDIRECT_URL ='/'
 # Auth
 LOGIN_REDIRECT_URL ='/dashboard/'

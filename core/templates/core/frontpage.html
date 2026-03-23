@@ -2,20 +2,37 @@
 {% block content %}
   <title>{% block title %}Welcome{% endblock%}</title>
 
-<header class="relative px-6 py-12 md:py-20 lg:py-32 bg-purple-900 overflow-hidden min-h-[600px] md:min-h-0 flex items-center">
-    <!-- Background image with better responsive handling -->
-    <div class="absolute inset-0 z-0 bg-cover bg-[center_top] md:bg-center opacity-50 grayscale-0 hover:grayscale transition duration-700" 
-         style="background-image: url('/media/uploads/bg.png');"></div>
-    
+<header class="relative px-6 py-12 md:py-20 lg:py-32 bg-purple-200 overflow-hidden min-h-[600px] md:min-h-0 flex items-center">
     <!-- Responsive Gradient Overlay -->
     <div class="absolute inset-0 z-0 bg-gradient-to-b md:bg-gradient-to-r from-purple-950 via-purple-900/80 to-transparent opacity-90 md:opacity-85"></div>
     
     <div class="relative z-10 max-w-6xl mx-auto w-full flex flex-col md:flex-row items-center justify-between">
-        <!-- Hero Text -->
-        <div class="w-full md:w-3/5 text-center md:text-left mb-10 md:mb-0">
+        <!-- Hero Text (Left Side) -->
+        <div class="w-full md:w-1/2 text-center md:text-left mb-8 md:mb-0">
             <h1 class="mb-4 text-4xl sm:text-5xl lg:text-7xl font-extrabold text-white leading-none sm:leading-tight">
                 Welcome to <span class="inline-block text-white drop-shadow-lg">MacShop</span>
             </h1>
+            
+            <!-- Stats Section - Directly below heading -->
+            <div class="mb-6 grid grid-cols-2 gap-3 max-w-md mx-auto md:mx-0">
+                <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/20 text-center transform hover:scale-105 transition">
+                    <div class="text-xl font-bold text-white mb-1">50k+</div>
+                    <div class="text-[10px] uppercase tracking-widest text-purple-200">Customers</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/20 text-center transform hover:scale-105 transition">
+                    <div class="text-xl font-bold text-white mb-1">200+</div>
+                    <div class="text-[10px] uppercase tracking-widest text-purple-200">Products</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/20 text-center transform hover:scale-105 transition">
+                    <div class="text-xl font-bold text-white mb-1">24/7</div>
+                    <div class="text-[10px] uppercase tracking-widest text-purple-200">Support</div>
+                </div>
+                <div class="bg-white/10 backdrop-blur-md p-3 rounded-xl border border-white/20 text-center transform hover:scale-105 transition">
+                    <div class="text-xl font-bold text-white mb-1">FREE</div>
+                    <div class="text-[10px] uppercase tracking-widest text-purple-200">Shipping</div>
+                </div>
+            </div>
+            
             <p class="mb-8 text-lg sm:text-xl lg:text-2xl text-purple-100 font-medium max-w-xl mx-auto md:mx-0">
                 We sell all Electronic Devices and their Software. Your premium destination for state-of-the-art technology.
             </p>
@@ -29,25 +46,53 @@
             </div>
         </div>
 
-        <!-- Professional Stats -->
-        <div class="w-full md:w-2/5 flex flex-col space-y-4 items-center md:items-end">
-            <div class="grid grid-cols-2 gap-3 sm:gap-4 w-full sm:w-auto">
-                <div class="bg-white/10 backdrop-blur-md p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/20 text-center transform hover:scale-105 transition">
-                    <div class="text-2xl sm:text-3xl font-bold text-white mb-1">50k+</div>
-                    <div class="text-[10px] sm:text-xs uppercase tracking-widest text-purple-200">Customers</div>
+        <!-- Image Carousel (Right Side) -->
+        <div class="w-full md:w-1/2 flex justify-center md:justify-end">
+            <div class="relative w-full max-w-md aspect-square rounded-2xl overflow-hidden shadow-2xl" 
+                 role="region" 
+                 aria-label="Product showcase carousel"
+                 tabindex="0">
+                <!-- Carousel Images -->
+                <div class="relative w-full h-full">
+                    <div id="carousel-image-1" class="absolute inset-0 transition-opacity duration-1000 ease-in-out">
+                        <img src="/media/uploads/hero1.jpeg" 
+                             alt="Featured electronic products showcase" 
+                             class="w-full h-full object-cover">
+                    </div>
+                    <div id="carousel-image-2" class="absolute inset-0 transition-opacity duration-1000 ease-in-out opacity-0">
+                        <img src="/media/uploads/hero2.jpeg" 
+                             alt="Technology devices display" 
+                             class="w-full h-full object-cover">
+                    </div>
                 </div>
-                <div class="bg-white/10 backdrop-blur-md p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/20 text-center transform hover:scale-105 transition">
-                    <div class="text-2xl sm:text-3xl font-bold text-white mb-1">200+</div>
-                    <div class="text-[10px] sm:text-xs uppercase tracking-widest text-purple-200">Products</div>
+                
+                <!-- Carousel Controls -->
+                <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+                    <button onclick="showSlide(1)" 
+                            aria-label="Go to slide 1" 
+                            class="w-3 h-3 rounded-full bg-white/70 hover:bg-white transition-colors carousel-dot"
+                            data-slide="1"></button>
+                    <button onclick="showSlide(2)" 
+                            aria-label="Go to slide 2" 
+                            class="w-3 h-3 rounded-full bg-white/30 hover:bg-white transition-colors carousel-dot"
+                            data-slide="2"></button>
                 </div>
-                <div class="bg-white/10 backdrop-blur-md p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/20 text-center transform hover:scale-105 transition">
-                    <div class="text-2xl sm:text-3xl font-bold text-white mb-1">24/7</div>
-                    <div class="text-[10px] sm:text-xs uppercase tracking-widest text-purple-200">Support</div>
-                </div>
-                <div class="bg-white/10 backdrop-blur-md p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-white/20 text-center transform hover:scale-105 transition">
-                    <div class="text-2xl sm:text-3xl font-bold text-white mb-1">FREE</div>
-                    <div class="text-[10px] sm:text-xs uppercase tracking-widest text-purple-200">Shipping</div>
-                </div>
+                
+                <!-- Navigation Arrows -->
+                <button onclick="previousSlide()" 
+                        aria-label="Previous slide" 
+                        class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                </button>
+                <button onclick="nextSlide()" 
+                        aria-label="Next slide" 
+                        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                </button>
             </div>
         </div>
     </div>
@@ -111,4 +156,106 @@
 </div>
     
 </div>
+
+<script>
+let currentSlide = 1;
+let autoRotateInterval;
+
+function showSlide(slideNumber) {
+    const totalSlides = 2;
+    
+    // Hide all slides
+    for (let i = 1; i <= totalSlides; i++) {
+        const slide = document.getElementById(`carousel-image-${i}`);
+        const dot = document.querySelector(`[data-slide="${i}"]`);
+        
+        if (slide) {
+            slide.style.opacity = '0';
+        }
+        if (dot) {
+            dot.classList.remove('bg-white/70');
+            dot.classList.add('bg-white/30');
+        }
+    }
+    
+    // Show current slide
+    const currentSlideElement = document.getElementById(`carousel-image-${slideNumber}`);
+    const currentDot = document.querySelector(`[data-slide="${slideNumber}"]`);
+    
+    if (currentSlideElement) {
+        currentSlideElement.style.opacity = '1';
+    }
+    if (currentDot) {
+        currentDot.classList.remove('bg-white/30');
+        currentDot.classList.add('bg-white/70');
+    }
+    
+    currentSlide = slideNumber;
+}
+
+function nextSlide() {
+    const nextSlideNumber = currentSlide === 2 ? 1 : currentSlide + 1;
+    showSlide(nextSlideNumber);
+    resetAutoRotate();
+}
+
+function previousSlide() {
+    const prevSlideNumber = currentSlide === 1 ? 2 : currentSlide - 1;
+    showSlide(prevSlideNumber);
+    resetAutoRotate();
+}
+
+function startAutoRotate() {
+    autoRotateInterval = setInterval(() => {
+        nextSlide();
+    }, 4000); // Rotate every 4 seconds
+}
+
+function resetAutoRotate() {
+    clearInterval(autoRotateInterval);
+    startAutoRotate();
+}
+
+// Keyboard navigation
+document.addEventListener('DOMContentLoaded', function() {
+    const carousel = document.querySelector('[role="region"][aria-label="Product showcase carousel"]');
+    
+    if (carousel) {
+        carousel.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    previousSlide();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    showSlide(1);
+                    resetAutoRotate();
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    showSlide(2);
+                    resetAutoRotate();
+                    break;
+            }
+        });
+        
+        // Start auto-rotation
+        startAutoRotate();
+        
+        // Pause auto-rotation on hover
+        carousel.addEventListener('mouseenter', () => {
+            clearInterval(autoRotateInterval);
+        });
+        
+        carousel.addEventListener('mouseleave', () => {
+            startAutoRotate();
+        });
+    }
+});
+</script>
 {% endblock %}
