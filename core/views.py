@@ -9,6 +9,7 @@ from .forms import SignUpForm
 from products.models import Product,Category
 from .models import Order, Stock, UserProfile
 from .decorators import redirect_admin_to_dashboard
+from django.contrib.auth import get_backends
 # Create your views here.
 @redirect_admin_to_dashboard
 def frontpage(request):
@@ -24,6 +25,9 @@ def signup(request):
         
         if form.is_valid():
             user = form.save()
+            # Specify the backend when logging in
+            backend = get_backends()[0]  # Get the first configured backend
+            user.backend = f'{backend.__module__}.{backend.__class__.__name__}'
             login(request, user)  # Log the user in after signup
             return redirect('/')  # Redirect to homepage or another page
     else:
