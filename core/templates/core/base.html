@@ -85,12 +85,10 @@
           <!-- Dropdown Menu -->
           <div class="absolute top-full left-0 w-64 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 mt-1">
             <div class="py-2">
-              <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">Laptops & Computers</a>
-              <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">Smartphones</a>
-              <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">Tablets</a>
-              <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">Accessories</a>
-              <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">Software</a>
-              <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">Gaming</a>
+              <a href="{% url 'shop' %}" class="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">All Categories</a>
+              {% for category in all_categories %}
+              <a href="{% url 'shop' %}?category={{ category.slug }}" class="block px-4 py-2 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">{{ category.name }}</a>
+              {% endfor %}
             </div>
           </div>
         </div>
@@ -171,12 +169,10 @@
   <div class="max-w-7xl mx-auto px-4 lg:px-8">
     <div class="flex items-center justify-between py-3 overflow-x-auto">
       <div class="flex items-center space-x-6 text-sm">
-        <a href="#" class="text-purple-700 hover:text-purple-900 font-medium whitespace-nowrap transition-colors">All Categories</a>
-        <a href="#" class="text-gray-600 hover:text-purple-700 whitespace-nowrap transition-colors">Best Sellers</a>
-        <a href="#" class="text-gray-600 hover:text-purple-700 whitespace-nowrap transition-colors">Gift Cards</a>
-        <a href="#" class="text-gray-600 hover:text-purple-700 whitespace-nowrap transition-colors">Deals</a>
-        <a href="#" class="text-gray-600 hover:text-purple-700 whitespace-nowrap transition-colors">New Releases</a>
-        <a href="#" class="text-gray-600 hover:text-purple-700 whitespace-nowrap transition-colors">Customer Service</a>
+        <a href="{% url 'shop' %}" class="text-purple-700 hover:text-purple-900 font-medium whitespace-nowrap transition-colors">All Categories</a>
+        {% for category in all_categories %}
+        <a href="{% url 'shop' %}?category={{ category.slug }}" class="text-gray-600 hover:text-purple-700 whitespace-nowrap transition-colors">{{ category.name }}</a>
+        {% endfor %}
       </div>
       
       <!-- Mobile Search (Hidden on Desktop) -->
@@ -204,22 +200,19 @@
         </svg>
       </button>
       <div id="mobileCategories" class="hidden pl-4 space-y-2">
-        <a href="#" class="block text-gray-600 hover:text-purple-600">Laptops & Computers</a>
-        <a href="#" class="block text-gray-600 hover:text-purple-600">Smartphones</a>
-        <a href="#" class="block text-gray-600 hover:text-purple-600">Tablets</a>
-        <a href="#" class="block text-gray-600 hover:text-purple-600">Accessories</a>
-        <a href="#" class="block text-gray-600 hover:text-purple-600">Software</a>
-        <a href="#" class="block text-gray-600 hover:text-purple-600">Gaming</a>
+        <a href="{% url 'shop' %}" class="block text-gray-600 hover:text-purple-600">All Categories</a>
+        {% for category in all_categories %}
+        <a href="{% url 'shop' %}?category={{ category.slug }}" class="block text-gray-600 hover:text-purple-600">{{ category.name }}</a>
+        {% endfor %}
       </div>
     </div>
     
     <!-- Mobile Secondary Links -->
     <div class="space-y-2 pt-4 border-t">
-      <a href="#" class="block text-gray-600 hover:text-purple-600">All Categories</a>
-      <a href="#" class="block text-gray-600 hover:text-purple-600">Best Sellers</a>
-      <a href="#" class="block text-gray-600 hover:text-purple-600">Gift Cards</a>
-      <a href="#" class="block text-gray-600 hover:text-purple-600">Deals</a>
-      <a href="#" class="block text-gray-600 hover:text-purple-600">New Releases</a>
+      <a href="{% url 'shop' %}" class="block text-gray-600 hover:text-purple-600">All Categories</a>
+      {% for category in all_categories %}
+      <a href="{% url 'shop' %}?category={{ category.slug }}" class="block text-gray-600 hover:text-purple-600">{{ category.name }}</a>
+      {% endfor %}
     </div>
   </div>
 </div>
