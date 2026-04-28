@@ -26,10 +26,17 @@ urlpatterns = [
     path('dashboard/categories/<int:category_id>/update/', admin_views.admin_category_update, name='admin_category_update'),
     path('dashboard/categories/<int:category_id>/delete/', admin_views.admin_category_delete, name='admin_category_delete'),
     path('dashboard/users/', admin_views.admin_user_list, name='admin_user_list'),
+    path('dashboard/users/add/', admin_views.admin_user_add, name='admin_user_add'),
+    path('dashboard/users/<int:user_id>/details/', admin_views.admin_user_details, name='admin_user_details'),
+    path('dashboard/users/<int:user_id>/edit/', admin_views.admin_user_edit, name='admin_user_edit'),
+    path('dashboard/users/<int:user_id>/toggle-status/', admin_views.admin_user_toggle_status, name='admin_user_toggle_status'),
+    path('dashboard/users/export/', admin_views.admin_user_export, name='admin_user_export'),
     path('dashboard/reports/', admin_views.admin_reports, name='admin_reports'),
     path('dashboard/settings/', admin_views.admin_settings, name='admin_settings'),
     
     # API endpoints for admin actions
+    path('dashboard/stock/<int:stock_id>/details/', admin_views.admin_stock_detail, name='admin_stock_detail'),
+    path('dashboard/stock/<int:stock_id>/edit/', admin_views.admin_stock_edit, name='admin_stock_edit'),
     path('dashboard/stock/<int:stock_id>/update/', admin_views.update_stock, name='admin_update_stock'),
     path('dashboard/orders/<int:order_id>/update-status/', admin_views.update_order_status, name='admin_update_order_status'),
     

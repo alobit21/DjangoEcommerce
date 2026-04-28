@@ -1,7 +1,7 @@
 from django.contrib.auth import login,logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q, Count, Sum, F
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
 from django.http import JsonResponse
@@ -64,7 +64,7 @@ def user_logout(request):
     # Check if user is admin and redirect accordingly
     if request.user.is_authenticated and (request.user.is_staff or request.user.is_superuser):
         return redirect('admin_dashboard')
-    return redirect('frontpage')
+    return redirect('home')
 
 @login_required
 def user_profile(request):
@@ -80,6 +80,52 @@ def user_profile(request):
     }
     
     return render(request, 'core/profile.html', context)
+
+@login_required
+def profile_update(request):
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        country = request.POST.get('country')
+        postal_code = request.POST.get('postal_code')
+        
+        user = request.user
+        user.first_name = first_name
+        user.last_name = last_name
+        user.email = email
+        user.save()
+        
+        try:
+            profile = user.userprofile
+        except UserProfile.DoesNotExist:
+            profile = UserProfile.objects.create(user=user)
+            
+        profile.phone = phone
+        profile.address = address
+        profile.city = city
+        profile.country = country
+        profile.postal_code = postal_code
+        profile.save()
+        
+        from django.contrib import messages
+        messages.success(request, 'Profile updated successfully!')
+        return redirect('profile')
+    
+    return redirect('profile')
+
+@login_required
+def order_history(request):
+    orders = Order.objects.filter(user=request.user).order_by('-created_at')
+    return render(request, 'core/order_history.html', {'orders': orders})
+
+@login_required
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    return render(request, 'core/order_detail.html', {'order': order})
 
 def is_admin(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
@@ -201,3 +247,13 @@ def admin_dashboard(request):
     }
     
     return render(request, 'admin_management/dashboard.html', context)
+
+def about(request):
+    return render(request, 'core/about.html')
+
+def contact(request):
+    return render(request, 'core/contact.html')
+
+def category_list(request):
+    categories = Category.objects.all()
+    return render(request, 'core/category_list.html', {'categories': categories})

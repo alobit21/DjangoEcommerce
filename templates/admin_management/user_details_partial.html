@@ -1,0 +1,79 @@
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h6>Basic Information</h6>
+            <table class="table table-sm">
+                <tbody>
+                    <tr>
+                        <th width="30%">Username:</th>
+                        <td>{{ user_detail.username }}</td>
+                    </tr>
+                    <tr>
+                        <th>Email:</th>
+                        <td>{{ user_detail.email }}</td>
+                    </tr>
+                    <tr>
+                        <th>Full Name:</th>
+                        <td>{{ user_detail.first_name }} {{ user_detail.last_name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date Joined:</th>
+                        <td>{{ user_detail.date_joined|date:"F j, Y, g:i a" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Last Login:</th>
+                        <td>{{ user_detail.last_login|date:"F j, Y, g:i a"|default:"Never" }}</td>
+                    </tr>
+                    <tr>
+                        <th>Status:</th>
+                        <td>
+                            {% if user_detail.is_superuser %}
+                                <span class="badge bg-danger">Superuser</span>
+                            {% elif user_detail.is_staff %}
+                                <span class="badge bg-warning">Staff</span>
+                            {% elif user_detail.is_active %}
+                                <span class="badge bg-success">Active</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Inactive</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <h6>Recent Orders</h6>
+            {% if recent_orders %}
+            <div class="table-responsive">
+                <table class="table table-sm table-hover">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td>#{{ order.id }}</td>
+                            <td>{{ order.created_at|date:"M d, Y" }}</td>
+                            <td>TSH {{ order.total_amount }}</td>
+                            <td>
+                                <span class="badge bg-{{ order.status_color }}">{{ order.get_status_display|default:order.status }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No recent orders.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -498,6 +498,153 @@ def admin_user_list(request):
     
     return render(request, 'admin_management/user_list.html', context)
 
+@login_required
+@user_passes_test(is_admin)
+def admin_user_add(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        first_name = request.POST.get('first_name', '')
+        last_name = request.POST.get('last_name', '')
+        is_staff = request.POST.get('is_staff') == 'on'
+        is_superuser = request.POST.get('is_superuser') == 'on'
+        
+        try:
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'Username already exists')
+            elif User.objects.filter(email=email).exists():
+                messages.error(request, 'Email already exists')
+            else:
+                user = User.objects.create_user(
+                    username=username,
+                    email=email,
+                    password=password,
+                    first_name=first_name,
+                    last_name=last_name
+                )
+                user.is_staff = is_staff
+                user.is_superuser = is_superuser
+                user.save()
+                messages.success(request, f'User "{username}" added successfully!')
+                return redirect('admin_user_list')
+        except Exception as e:
+            messages.error(request, f'Error adding user: {str(e)}')
+            
+    return render(request, 'admin_management/user_form.html', {'title': 'Add User'})
+
+@login_required
+@user_passes_test(is_admin)
+def admin_user_details(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    recent_orders = Order.objects.filter(user=user).order_by('-created_at')[:5]
+    context = {
+        'user_detail': user,
+        'recent_orders': recent_orders,
+    }
+    return render(request, 'admin_management/user_details_partial.html', context)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_user_edit(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name', '')
+        last_name = request.POST.get('last_name', '')
+        is_staff = request.POST.get('is_staff') == 'on'
+        is_superuser = request.POST.get('is_superuser') == 'on'
+        
+        try:
+            if User.objects.filter(username=username).exclude(id=user.id).exists():
+                messages.error(request, 'Username already exists')
+            elif User.objects.filter(email=email).exclude(id=user.id).exists():
+                messages.error(request, 'Email already exists')
+            else:
+                user.username = username
+                user.email = email
+                user.first_name = first_name
+                user.last_name = last_name
+                
+                if request.user.is_superuser:
+                    user.is_staff = is_staff
+                    user.is_superuser = is_superuser
+                
+                user.save()
+                messages.success(request, f'User "{username}" updated successfully!')
+                return redirect('admin_user_list')
+        except Exception as e:
+            messages.error(request, f'Error updating user: {str(e)}')
+            
+    context = {
+        'edit_user': user,
+        'title': 'Edit User'
+    }
+    return render(request, 'admin_management/user_form.html', context)
+
+@require_POST
+@login_required
+@user_passes_test(is_admin)
+def admin_user_toggle_status(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if user.is_superuser:
+        return JsonResponse({'success': False, 'message': 'Cannot toggle status of superuser'})
+    
+    try:
+        user.is_active = not user.is_active
+        user.save()
+        status_text = 'active' if user.is_active else 'inactive'
+        return JsonResponse({'success': True, 'message': f'User status set to {status_text}'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=400)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_user_export(request):
+    import csv
+    from django.http import HttpResponse
+    
+    search = request.GET.get('search', '')
+    users = User.objects.all().order_by('-date_joined')
+    
+    if search:
+        users = users.filter(
+            Q(username__icontains=search) |
+            Q(email__icontains=search) |
+            Q(first_name__icontains=search) |
+            Q(last_name__icontains=search)
+        )
+        
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="users_export.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow(['ID', 'Username', 'Email', 'First Name', 'Last Name', 'Role', 'Status', 'Joined Date'])
+    
+    for user in users:
+        if user.is_superuser:
+            role = 'Superuser'
+        elif user.is_staff:
+            role = 'Staff'
+        else:
+            role = 'Customer'
+            
+        status = 'Active' if user.is_active else 'Inactive'
+        
+        writer.writerow([
+            user.id,
+            user.username,
+            user.email,
+            user.first_name,
+            user.last_name,
+            role,
+            status,
+            user.date_joined.strftime('%Y-%m-%d %H:%M:%S')
+        ])
+        
+    return response
+
 @require_POST
 @login_required
 @user_passes_test(is_admin)
@@ -534,6 +681,48 @@ def update_stock(request, stock_id):
             'success': False,
             'message': str(e)
         }, status=400)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_stock_detail(request, stock_id):
+    stock = get_object_or_404(Stock, id=stock_id)
+    return JsonResponse({
+        'id': stock.id,
+        'product_name': stock.product.name,
+        'quantity': stock.quantity,
+        'reorder_level': stock.reorder_level
+    })
+
+@require_POST
+@login_required
+@user_passes_test(is_admin)
+def admin_stock_edit(request, stock_id):
+    stock = get_object_or_404(Stock, id=stock_id)
+    try:
+        data = json.loads(request.body)
+        new_quantity = data.get('quantity')
+        new_reorder_level = data.get('reorder_level')
+        reason = data.get('reason', 'Manual Edit')
+        
+        if new_quantity is not None:
+            diff = int(new_quantity) - stock.quantity
+            if diff != 0:
+                StockTransaction.objects.create(
+                    stock=stock,
+                    transaction_type='adjustment',
+                    quantity=abs(diff),
+                    reason=reason,
+                    created_by=request.user
+                )
+            stock.quantity = int(new_quantity)
+            
+        if new_reorder_level is not None:
+            stock.reorder_level = int(new_reorder_level)
+            
+        stock.save()
+        return JsonResponse({'success': True, 'message': 'Stock updated successfully'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=400)
 
 @require_POST
 @login_required

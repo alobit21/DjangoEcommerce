@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-4">Product Categories</h3>
+    <div class="row">
+        {% for category in categories %}
+        <div class="col-md-4 mb-4">
+            <div class="card category-card h-100 shadow-sm" onclick="window.location.href='{% url 'shop' %}?category={{ category.slug }}'">
+                <div class="card-body text-center d-flex align-items-center justify-content-center">
+                    <h5 class="card-title mb-0">{{ category.name }}</h5>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No categories available.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
