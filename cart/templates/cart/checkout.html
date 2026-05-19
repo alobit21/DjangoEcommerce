@@ -1,63 +1,208 @@
 {% extends 'core/base.html' %}
 {% block content %}
- 
-<div class="max-w-6xl flex flex-wrap items-start mx-auto py-6 px-6 xl:px-0">
-    <div class="products w-full lg:w-3/4">
-        <h1 class="mb-5 text-3xl">Checkout</h1>
-        <form action="." method="POST">
-            {% csrf_token %}
-            <div class="w-full pr-6">
-                <div class="mb-6 p-6 bg-gray-100 rounded-xl">
-                    <h2 class="mb-5 uppercase text-lg">Shipping Information</h2>
-                    <div class="flex space-x-6">
-                        <div class="w-1/2 mb-4">
-                            <label class="inline-block mb-2" for="first_name">First Name</label>
-                            <input type="text" id="first_name" class="w-full p-5 rounded-xl" name="first_name" value="{{ request.user.first_name }}" required>
-                        </div>
-                        <div class="w-1/2 mb-4">
-                            <label class="inline-block mb-2" for="last_name">Last Name</label>
-                            <input type="text" id="last_name" class="w-full p-5 rounded-xl" name="last_name" value="{{ request.user.last_name }}" required>
-                        </div>
-                    </div>
-                    <div class="mb-4">
-                        <label class="inline-block mb-2" for="address">Address</label>
-                        <input type="text" id="address" class="w-full p-5 rounded-xl" name="address" required>
-                    </div>
-                    <div class="flex space-x-6">
-                        <div class="w-1/2 mb-4">
-                            <label class="inline-block mb-2" for="zip_code">ZIP Code</label>
-                            <input type="text" id="zip_code" class="w-full p-5 rounded-xl" name="zip_code" required>
-                        </div>
-                        <div class="w-1/2 mb-4">
-                            <label class="inline-block mb-2" for="city">City</label>
-                            <input type="text" id="city" class="w-full p-5 rounded-xl" name="city" required>
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-6 p-6 bg-gray-100 rounded-xl">
-                    <h2 class="mb-5 uppercase text-lg">Contact Information</h2>
-                    <div class="mb-4">
-                        <label class="inline-block mb-2" for="email">Email</label>
-                        <input type="email" id="email" class="w-full p-5 rounded-xl" name="email" value="{{ request.user.email }}" required>
-                        <label class="inline-block mb-2" for="phone">Phone</label>
-                        <input type="tel" id="phone" class="w-full p-5 rounded-xl" name="phone" required>
-                    </div>
-                </div>
-                <div class="mb-6 p-6 bg-gray-100 rounded-xl">
-                    <h2 class="mb-5 uppercase text-lg">Payment Information</h2>
-                    <!-- Payment fields can be added here -->
-                </div>
-            </div>
-            <div class="summary w-1/4 p-6 bg-gray-100 rounded-xl mt-3">
-                <h2 class="uppercase text-lg mb-5">Summary</h2>
-                <div class="mb-5 flex justify-between">
-                    <span class="font-semibold">Total</span>
-                    <span>${{ cart.get_total_cost }}</span>
-                </div>
-                <button type="submit" class="inline-block px-8 py-4 rounded-xl bg-purple-500 hover:bg-purple-700 text-white">Confirm Checkout</button>
-            </div>
-        </form>
-    </div>
-</div>
+<title>{% block title %}Secure Checkout{% endblock %}</title>
 
+<div class="bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
+    
+    <!-- 1. Checkout Page Header -->
+    <div class="mb-12 border-b border-slate-100 pb-6">
+      <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-900">Secure Checkout</h1>
+      <p class="text-sm text-slate-500 mt-2">
+        Complete your order securely in just a few quick steps.
+      </p>
+    </div>
+
+    <!-- 2. Main Checkout Form Layout Grid -->
+    <!-- Form wraps the entire multi-column layout for complete input collection -->
+    <form action="." method="POST" class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+        {% csrf_token %}
+        
+        <!-- Left Side: Guided Checkout Steps (8 Columns) -->
+        <div class="lg:col-span-8 space-y-8">
+            
+            <!-- Step 1: Shipping Information Card -->
+            <div class="bg-white border border-slate-100 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6">
+                <h2 class="text-lg font-extrabold tracking-tight text-slate-900 border-b border-slate-100 pb-4 flex items-center gap-2">
+                    <span class="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs" aria-hidden="true">1</span>
+                    Shipping Address
+                </h2>
+                
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-800" for="first_name">First Name</label>
+                            <input type="text" id="first_name" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm" name="first_name" value="{{ request.user.first_name }}" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-800" for="last_name">Last Name</label>
+                            <input type="text" id="last_name" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm" name="last_name" value="{{ request.user.last_name }}" required>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-800" for="address">Delivery Address</label>
+                        <input type="text" id="address" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm" name="address" placeholder="Street Name, Apartment, Suite..." required>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-800" for="zip_code">ZIP / Postal Code</label>
+                            <input type="text" id="zip_code" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm" name="zip_code" required>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-800" for="city">City / Region</label>
+                            <input type="text" id="city" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm" name="city" required>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Contact Information Card -->
+            <div class="bg-white border border-slate-100 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6">
+                <h2 class="text-lg font-extrabold tracking-tight text-slate-900 border-b border-slate-100 pb-4 flex items-center gap-2">
+                    <span class="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs" aria-hidden="true">2</span>
+                    Contact Information
+                </h2>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-800" for="email">Email Address</label>
+                        <input type="email" id="email" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm" name="email" value="{{ request.user.email }}" required>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-800" for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm" name="phone" placeholder="e.g. +255..." required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Premium Mock Payment Method Selector Card -->
+            <div class="bg-white border border-slate-100 p-6 sm:p-8 rounded-3xl shadow-sm space-y-6">
+                <h2 class="text-lg font-extrabold tracking-tight text-slate-900 border-b border-slate-100 pb-4 flex items-center gap-2">
+                    <span class="w-6 h-6 bg-slate-900 text-white rounded-full flex items-center justify-center text-xs" aria-hidden="true">3</span>
+                    Payment Method
+                </h2>
+                
+                <div class="space-y-6">
+                    <!-- Selector radio buttons mockup -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <label class="border border-slate-900 rounded-2xl p-4 flex items-center justify-between cursor-pointer bg-slate-50/50">
+                            <span class="flex items-center gap-2.5 text-sm font-bold text-slate-900">
+                                <svg class="w-4 h-4 text-slate-900" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                    <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h3a1 1 0 100-2H9z"></path>
+                                </svg>
+                                Credit Card
+                            </span>
+                            <input type="radio" name="payment_method" value="stripe" checked class="text-slate-900 focus:ring-slate-900 w-4 h-4">
+                        </label>
+                        <label class="border border-slate-200 hover:border-slate-300 rounded-2xl p-4 flex items-center justify-between cursor-pointer bg-white transition-colors">
+                            <span class="flex items-center gap-2.5 text-sm font-medium text-slate-500">
+                                <svg class="w-4 h-4 text-slate-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                                    <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4zM18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h3a1 1 0 100-2H9z"></path>
+                                </svg>
+                                PayPal
+                            </span>
+                            <input type="radio" name="payment_method" value="paypal" class="text-slate-900 focus:ring-slate-900 w-4 h-4">
+                        </label>
+                    </div>
+
+                    <!-- Payment Mock fields -->
+                    <div class="space-y-4 pt-2">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-800" for="card_name">Name on Card</label>
+                            <input type="text" id="card_name" placeholder="John Doe" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm">
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-800" for="card_number">Card Number</label>
+                            <div class="relative">
+                                <input type="text" id="card_number" placeholder="•••• •••• •••• ••••" class="w-full pl-4 pr-12 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm">
+                                <span class="absolute right-4 top-3.5 text-slate-400" aria-hidden="true">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+                                    </svg>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-800" for="card_expiry">Expiry Date</label>
+                                <input type="text" id="card_expiry" placeholder="MM / YY" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-800" for="card_cvc">CVC / CVV</label>
+                                <input type="text" id="card_cvc" placeholder="•••" class="w-full px-4 py-3.5 border border-slate-200 rounded-xl bg-slate-50 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Side: Order Summary sticky Card (4 Columns) -->
+        <aside class="lg:col-span-4 lg:sticky lg:top-28">
+            <div class="bg-white border border-slate-100 p-6 rounded-3xl shadow-sm hover:shadow-md transition-all duration-300 space-y-6">
+                
+                <h2 class="text-lg font-extrabold tracking-tight text-slate-900 border-b border-slate-100 pb-4">
+                    Order Summary
+                </h2>
+
+                <!-- Pricing itemization details -->
+                <div class="space-y-3.5 text-sm">
+                    <div class="flex justify-between text-slate-500">
+                        <span>Subtotal</span>
+                        <span class="font-semibold text-slate-900">TSH {{ cart.get_total_cost|floatformat:2 }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between text-slate-500">
+                        <span>Shipping</span>
+                        <span class="text-emerald-600 font-semibold">Free Express</span>
+                    </div>
+
+                    <div class="flex justify-between text-slate-500 pb-4 border-b border-slate-100">
+                        <span>Estimated Taxes</span>
+                        <span>—</span>
+                    </div>
+
+                    <!-- Prominent Grand Total display -->
+                    <div class="flex justify-between items-baseline pt-2">
+                        <span class="text-base font-extrabold text-slate-900">Total</span>
+                        <span class="text-xl font-extrabold text-slate-900">
+                            TSH {{ cart.get_total_cost|floatformat:2 }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Action Submit Button -->
+                <div class="pt-2">
+                    <button type="submit" class="w-full inline-flex items-center justify-center px-8 py-4 text-sm font-bold text-white bg-slate-900 rounded-full hover:bg-slate-800 transition-all duration-200 shadow-md shadow-slate-900/10 hover:shadow-slate-900/20 focus:outline-none focus:ring-2 focus:ring-slate-900 hover:-translate-y-0.5">
+                        Confirm & Place Order
+                    </button>
+                </div>
+
+                <!-- Security Trust badges -->
+                <div class="pt-4 border-t border-slate-100 space-y-3 text-[11px] text-slate-400">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                        <span>Secure bank-grade 256-bit SSL connection.</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <span>Safe transit shipping and package insurance.</span>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+
+    </form>
+  </div>
+</div>
 {% endblock %}
