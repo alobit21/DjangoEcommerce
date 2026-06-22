@@ -14,6 +14,7 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . .
+RUN cp -R media media_seed 2>/dev/null || true
 
 # Collect static files at build time with a dummy key
 RUN SECRET_KEY=build-time-dummy-key \
