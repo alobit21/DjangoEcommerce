@@ -4,6 +4,7 @@ Uses python-decouple to read from .env file or environment variables.
 """
 
 from pathlib import Path
+# pyrefly: ignore [missing-import]
 from decouple import config, Csv
 import os
 
