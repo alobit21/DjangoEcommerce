@@ -1,0 +1,44 @@
+services:
+
+  # ── PostgreSQL ───────────────────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Django + Gunicorn ────────────────────────────────────────────────────────
+  web:
+    image: ${DOCKERHUB_USERNAME}/macshop:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - DB_HOST=db
+    ports:
+      - "${APP_PORT:-8010}:8000"        # default 8010 — override in .env if taken
+    volumes:
+      - media_files:/app/media
+      - static_files:/app/staticfiles
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             gunicorn --bind 0.0.0.0:8000 --workers 3 --timeout 120
+             --access-logfile - --error-logfile -
+             ecom.wsgi:application"
+
+volumes:
+  postgres_data:
+  media_files:
+  static_files:
