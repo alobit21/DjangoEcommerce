@@ -93,3 +93,9 @@ jobs:
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d --remove-orphans
             docker image prune -f
+            
+            # Seed the database
+            echo "Waiting for container to start..."
+            sleep 10
+            docker compose -f docker-compose.prod.yml exec -T web python manage.py flush --noinput
+            docker compose -f docker-compose.prod.yml exec -T web python manage.py loaddata data.json
