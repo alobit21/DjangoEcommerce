@@ -17,8 +17,9 @@ class Cart(object):
             product = Product.objects.get(pk=product_id)
             cart_item = self.cart[str(product_id)].copy()
             cart_item['product'] = product
-            # Convert USD cents to TSH
-            cart_item['total_price'] = (product.price * cart_item['quantity'] * 2500) / 100
+            # Convert USD to TSH
+            cart_item['price'] = product.price * 2500
+            cart_item['total_price'] = product.price * cart_item['quantity'] * 2500
             cart_items.append(cart_item)
         
         for item in cart_items:
@@ -58,4 +59,4 @@ class Cart(object):
         for product_id in self.cart.keys():
             product = Product.objects.get(pk=product_id)
             total_cost += product.price * self.cart[str(product_id)]['quantity']
-        return (total_cost * 2500) / 100  # Convert USD cents to TSH
+        return total_cost * 2500  # Convert USD to TSH
