@@ -1,4 +1,5 @@
 from django.contrib.auth import login,logout
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q, Count, Sum, F
 from django.shortcuts import render,redirect,get_object_or_404
@@ -10,7 +11,105 @@ from products.models import Product,Category
 from .models import Order, Stock, UserProfile
 from .decorators import redirect_admin_to_dashboard
 from django.contrib.auth import get_backends
-# Create your views here.
+from decouple import config
+import os
+from google_auth_oauthlib.flow import Flow
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+
+# ONLY FOR LOCAL DEV: Allow HTTP traffic for OAuth
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+def get_google_flow():
+    client_config = {
+        "web": {
+            "client_id": config("GOOGLE_CLIENT_ID"),
+            "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+            "token_uri": "https://oauth2.googleapis.com/token",
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_secret": config("GOOGLE_CLIENT_SECRET"),
+            "redirect_uris": [config("GOOGLE_REDIRECT_URI")],
+        }
+    }
+    flow = Flow.from_client_config(
+        client_config,
+        scopes=["openid", "https://www.googleapis.com/auth/userinfo.email", "https://www.googleapis.com/auth/userinfo.profile"]
+    )
+    flow.redirect_uri = config("GOOGLE_REDIRECT_URI")
+    return flow
+
+def google_login(request):
+    flow = get_google_flow()
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true',
+        prompt='consent'
+    )
+    request.session['google_oauth_state'] = state
+    # Save the PKCE code verifier in the session
+    if hasattr(flow, 'code_verifier'):
+        request.session['google_code_verifier'] = flow.code_verifier
+    return redirect(authorization_url)
+
+def google_callback(request):
+    from django.utils.http import urlencode
+    
+    state = request.session.get('google_oauth_state')
+    # Validate CSRF State
+    if not state or state != request.GET.get('state'):
+        return redirect('/login/?' + urlencode({'error': f"CSRF_Failed_State_Was_{state}"}))
+        
+    flow = get_google_flow()
+    
+    # Restore the PKCE code verifier
+    code_verifier = request.session.get('google_code_verifier')
+    if code_verifier:
+        flow.code_verifier = code_verifier
+        
+    # Exchange auth code for token
+    try:
+        flow.fetch_token(authorization_response=request.build_absolute_uri())
+    except Exception as e:
+        return redirect('/login/?' + urlencode({'error': f"TokenFetchError_{str(e)}"}))
+    
+    credentials = flow.credentials
+    request_session = google_requests.Request()
+    try:
+        # Verify ID token using Google's public keys
+        id_info = id_token.verify_oauth2_token(
+            credentials.id_token, 
+            request_session, 
+            config("GOOGLE_CLIENT_ID"),
+            clock_skew_in_seconds=10
+        )
+    except ValueError as e:
+        return redirect('/login/?' + urlencode({'error': f"VerifyError_{str(e)}"}))
+        
+    email = id_info.get('email')
+    google_id = id_info.get('sub')
+    name = id_info.get('name', '')
+    
+    # Get or Create the Django User
+    user = User.objects.filter(email=email).first()
+    if not user:
+        user = User.objects.create_user(username=email, email=email)
+        user.first_name = name.split()[0] if name else ''
+        user.last_name = ' '.join(name.split()[1:]) if name and len(name.split()) > 1 else ''
+        user.save()
+        
+    # Bind Google ID to UserProfile
+    profile, created = UserProfile.objects.get_or_create(user=user)
+    if not profile.google_id:
+        profile.google_id = google_id
+        profile.save()
+        
+    # Authenticate and login
+    backend = get_backends()[0]
+    user.backend = f'{backend.__module__}.{backend.__class__.__name__}'
+    login(request, user)
+    
+    return redirect('home')
+
 @redirect_admin_to_dashboard
 def frontpage(request):
 	products = Product.objects.all()[0:8]

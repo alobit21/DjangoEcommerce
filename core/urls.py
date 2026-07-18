@@ -12,6 +12,8 @@ urlpatterns = [
     path('signup/', views.signup, name="signup"),
     path('register/', views.signup, name="register"),
     path('login/', auth_views.LoginView.as_view(template_name='core/login.html'), name="login"),
+    path('auth/google/login', views.google_login, name="google_login"),
+    path('auth/google/callback', views.google_callback, name="google_callback"),
     path('logout/', views.user_logout, name='logout'),
     path('profile/', views.user_profile, name="profile"),
     path('profile/update/', views.profile_update, name="profile_update"),
