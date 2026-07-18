@@ -59,6 +59,71 @@ def cart(request):
 
     return render(request, 'cart/cart.html', {'cart': cart})
 
+from core.models import Order, OrderItem, Payment
+from core.clickpesa_service import ClickPesaService
+import uuid
+
 @login_required
 def checkout(request):
-    return render(request, 'cart/checkout.html')
+    cart = Cart(request)
+    
+    if len(cart) == 0:
+        messages.error(request, "Your cart is empty.")
+        return redirect('shop')
+        
+    if request.method == 'POST':
+        # Get data from request.POST
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        address = request.POST.get('address')
+        zip_code = request.POST.get('zip_code')
+        city = request.POST.get('city')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        # We enforce clickpesa for now
+        payment_method = request.POST.get('payment_method', 'clickpesa')
+        
+        full_address = f"{address}, {city}, {zip_code}"
+        
+        # Create order
+        order = Order.objects.create(
+            user=request.user,
+            order_number=str(uuid.uuid4())[:10].upper(),
+            total_amount=cart.get_total_cost(),
+            shipping_address=full_address
+        )
+        
+        # Create order items
+        for item in cart:
+            OrderItem.objects.create(
+                order=order,
+                product=item['product'],
+                price=item['price'],
+                quantity=item['quantity']
+            )
+            
+        # Create Payment
+        payment = Payment.objects.create(
+            order=order,
+            amount=order.total_amount,
+            currency='TZS',
+            phone_number=phone,
+            channel=payment_method
+        )
+        
+        # Initiate ClickPesa Payment
+        payment_phone = request.POST.get('payment_phone')
+        clean_phone = payment_phone.replace('+', '').strip() if payment_phone else phone.replace('+', '').strip()
+        
+        clickpesa = ClickPesaService()
+        result = clickpesa.initiate_mobile_money_payment(payment, clean_phone, payment_method)
+        
+        if result['success']:
+            messages.success(request, 'Payment initiated! Please check your phone to approve the USSD push.')
+            cart.clear()
+            return redirect('frontpage')
+        else:
+            messages.error(request, f"Payment failed: {result.get('error')}")
+            return redirect('checkout')
+            
+    return render(request, 'cart/checkout.html', {'cart': cart})

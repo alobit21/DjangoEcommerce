@@ -131,3 +131,6 @@ if not DEBUG:
 
 # ── Misc ──────────────────────────────────────────────────────────────────────
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+CLICKPESA_CLIENT_ID = config('CLICKPESA_CLIENT_ID', default='')
+CLICKPESA_API_KEY = config('CLICKPESA_API_KEY', default='')
+CLICKPESA_SECRET_KEY = config('CLICKPESA_SECRET_KEY', default='')

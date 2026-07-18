@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+import uuid
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -23,10 +24,15 @@ class Order(models.Model):
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled'),
     ]
-    
+    class PaymentStatus(models.TextChoices):
+        PENDING_PAYMENT = 'PENDING_PAYMENT', 'Pending Payment'
+        PAID = 'PAID', 'Paid'
+        PAYMENT_FAILED = 'PAYMENT_FAILED', 'Payment Failed'
+        
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     order_number = models.CharField(max_length=50, unique=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    payment_status = models.CharField(max_length=20, choices=PaymentStatus.choices, default=PaymentStatus.PENDING_PAYMENT)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     shipping_address = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -82,7 +88,30 @@ class StockTransaction(models.Model):
     
     def __str__(self):
         return f"{self.transaction_type} - {self.quantity} units"
-   
-   
-   
-   
+
+class Payment(models.Model):
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'Pending'
+        PROCESSING = 'PROCESSING', 'Processing'
+        COMPLETED = 'COMPLETED', 'Completed'
+        FAILED = 'FAILED', 'Failed'
+        REFUNDED = 'REFUNDED', 'Refunded'
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    currency = models.CharField(max_length=3, default='TZS')
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
+    
+    # ClickPesa specific fields
+    clickpesa_payment_id = models.CharField(max_length=100, blank=True, null=True)
+    reference_number = models.CharField(max_length=100, blank=True, null=True)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    channel = models.CharField(max_length=50, blank=True, null=True)
+    failure_reason = models.TextField(blank=True, null=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Payment {self.id} - {self.status}"
