@@ -33,9 +33,11 @@ def update_cart(request, product_id, action):
     try:
         cart = Cart(request)
         if action == 'increment':
-            cart.add(product_id, quantity=1, update_quantity=False)
-        elif action == 'decrement':
             cart.add(product_id, quantity=1, update_quantity=True)
+        elif action == 'decrement':
+            cart.add(product_id, quantity=-1, update_quantity=True)
+        elif action == 'remove':
+            cart.remove(product_id)
         
         if request.headers.get('HX-Request'):
             # Return the updated cart HTML
