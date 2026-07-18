@@ -1,6 +1,10 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Category, Product
+from .models import Category, Product, ProductImage
+
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 3
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -17,6 +21,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
+    inlines = [ProductImageInline]
     list_display = ('name', 'category', 'price', 'get_display_price', 'created_at', 'stock_status', 'image_thumbnail')
     list_filter = ('category', 'created_at', 'price')
     search_fields = ('name', 'description', 'category__name')

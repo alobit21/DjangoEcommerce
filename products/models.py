@@ -73,5 +73,13 @@ class Product(models.Model):
 
         return thumbnail
 
-
-
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='uploads/gallery/', blank=False, null=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ('created_at',)
+        
+    def __str__(self):
+        return f"Image for {self.product.name}"

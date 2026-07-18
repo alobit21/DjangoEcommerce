@@ -10,7 +10,7 @@ from datetime import timedelta
 import json
 from django.contrib import messages
 
-from products.models import Product, Category
+from products.models import Product, Category, ProductImage
 from .models import Order, OrderItem, Stock, StockTransaction, UserProfile
 
 def is_admin(user):
@@ -89,6 +89,11 @@ def admin_product_add(request):
                 product.thumbnail = product.make_thumbnail(image)
                 product.save()
             
+            # Handle gallery images
+            gallery_images = request.FILES.getlist('gallery_images')
+            for g_image in gallery_images:
+                ProductImage.objects.create(product=product, image=g_image)
+            
             # Create stock record
             Stock.objects.create(
                 product=product,
@@ -140,6 +145,11 @@ def admin_product_edit(request, product_slug):
                 product.thumbnail = product.make_thumbnail(image)
             
             product.save()
+            
+            # Handle gallery images
+            gallery_images = request.FILES.getlist('gallery_images')
+            for g_image in gallery_images:
+                ProductImage.objects.create(product=product, image=g_image)
             
             # Update stock
             stock.quantity = int(stock_quantity)
