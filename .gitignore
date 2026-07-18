@@ -10,3 +10,4 @@ db.sqlite3.backup
 deploy.sh
 
 .env
+venv/
