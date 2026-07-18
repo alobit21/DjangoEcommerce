@@ -63,7 +63,7 @@
         
         <!-- Logo -->
         <a href="{% url 'frontpage' %}" class="flex-shrink-0 group flex items-center gap-2" aria-label="MacShop Home">
-          <span class="text-2xl font-bold tracking-tight text-gray-900 group-hover:text-gray-600 transition-colors">MacShop.</span>
+          <img src="/media/logo/logo.png" alt="MacShop Logo" class="h-8 md:h-10 w-auto object-contain transition-transform duration-200 group-hover:scale-105">
         </a>
 
         <!-- Desktop Navigation & Search -->
@@ -222,7 +222,9 @@
         
         <!-- Brand / About -->
         <div class="lg:col-span-1 space-y-6">
-          <a href="{% url 'frontpage' %}" class="text-2xl font-bold tracking-tight text-gray-900 inline-block">MacShop.</a>
+          <a href="{% url 'frontpage' %}" class="inline-block">
+            <img src="/media/logo/logo.png" alt="MacShop Logo" class="h-8 w-auto object-contain hover:opacity-80 transition-opacity">
+          </a>
           <p class="text-sm text-gray-500 leading-relaxed">
             Premium electronics and modern tech accessories tailored for your lifestyle. Engineered for excellence.
           </p>

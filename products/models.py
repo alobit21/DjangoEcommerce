@@ -41,6 +41,15 @@ class Product(models.Model):
         tsh_price = self.price * 2500  # Convert USD to TSH
         return "TSH {:,.2f}".format(tsh_price)
 
+    def get_rating(self):
+        reviews = self.reviews.all()
+        if not reviews:
+            return 0
+        return sum([review.rating for review in reviews]) / len(reviews)
+        
+    def get_rating_count(self):
+        return self.reviews.count()
+
     def get_thumbnail(self):
         if self.thumbnail:
             return self.thumbnail.url
@@ -83,3 +92,17 @@ class ProductImage(models.Model):
         
     def __str__(self):
         return f"Image for {self.product.name}"
+
+class Review(models.Model):
+    product = models.ForeignKey(Product, related_name='reviews', on_delete=models.CASCADE)
+    user = models.ForeignKey('auth.User', related_name='reviews', on_delete=models.CASCADE)
+    rating = models.IntegerField(default=5)
+    content = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ('-created_at',)
+        unique_together = ('product', 'user') # One review per user per product
+        
+    def __str__(self):
+        return f"{self.rating} stars for {self.product.name} by {self.user.username}"
