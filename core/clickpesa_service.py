@@ -49,6 +49,14 @@ class ClickPesaService:
         The returned token string already contains the "Bearer " prefix.
         Token is valid for 1 hour.
         """
+        from django.core.cache import cache
+        
+        cache_key = f'clickpesa_token_{self.client_id}'
+        token = cache.get(cache_key)
+        
+        if token:
+            return token
+            
         url = f"{self.BASE_URL}/generate-token"
         headers = {
             'client-id': self.client_id,
@@ -64,8 +72,11 @@ class ClickPesaService:
         if not data.get('success'):
             raise ValueError(f"ClickPesa token generation failed: {data}")
 
-        # 'token' already includes the "Bearer " prefix per the docs
-        return data['token']
+        token = data['token']
+        # Token is valid for 1 hour, cache for 55 minutes
+        cache.set(cache_key, token, timeout=3300)
+        
+        return token
 
     def _get_auth_headers(self, token):
         """
