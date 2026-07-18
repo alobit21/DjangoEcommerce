@@ -15,7 +15,7 @@
 
     <!-- 2. Main Checkout Form Layout Grid -->
     <!-- Form wraps the entire multi-column layout for complete input collection -->
-    <form action="." method="POST" class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+    <form hx-post="{% url 'checkout' %}" hx-target="this" hx-swap="outerHTML" class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start" id="checkout-form">
         {% csrf_token %}
         
         <!-- Left Side: Guided Checkout Steps (8 Columns) -->

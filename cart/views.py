@@ -136,11 +136,34 @@ def checkout(request):
         result = clickpesa.initiate_mobile_money_payment(payment, clean_phone, network)
         
         if result['success']:
-            messages.success(request, 'Payment initiated! Please check your phone to approve the USSD push.')
-            cart.clear()
-            return redirect('frontpage')
+            payment_id = result.get('payment_id')
+            return render(request, 'cart/partials/payment_polling.html', {'payment': payment})
         else:
             messages.error(request, f"Payment failed: {result.get('error')}")
+            # If HTMX request, redirect with HTMX
+            if request.headers.get('HX-Request'):
+                from django.http import HttpResponse
+                return HttpResponse(f'<script>window.location.href="{request.path}"</script>')
             return redirect('checkout')
             
     return render(request, 'cart/checkout.html', {'cart': cart})
+
+from django.shortcuts import get_object_or_404
+
+def check_payment_status(request, payment_id):
+    payment = get_object_or_404(Payment, id=payment_id)
+    clickpesa = ClickPesaService()
+    
+    # Check status from ClickPesa
+    clickpesa.check_payment_status(payment)
+    payment.refresh_from_db()
+    
+    if payment.status == Payment.Status.COMPLETED:
+        cart = Cart(request)
+        cart.clear()
+        return render(request, 'cart/partials/payment_success.html', {'payment': payment})
+    elif payment.status == Payment.Status.FAILED:
+        return render(request, 'cart/partials/payment_failed.html', {'payment': payment, 'reason': payment.failure_reason})
+    else:
+        # Still processing
+        return render(request, 'cart/partials/payment_polling.html', {'payment': payment})

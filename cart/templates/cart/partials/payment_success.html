@@ -1,0 +1,16 @@
+<div class="col-span-1 lg:col-span-12 flex flex-col items-center justify-center py-20 px-4 text-center bg-emerald-50 rounded-3xl border border-emerald-100 shadow-sm" id="checkout-form">
+    <div class="w-20 h-20 bg-emerald-500 text-white rounded-full flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/30">
+        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+        </svg>
+    </div>
+    
+    <h2 class="text-3xl font-extrabold text-emerald-900 mb-2">Payment Successful!</h2>
+    <p class="text-emerald-700 max-w-sm mx-auto mb-8 font-medium">
+        Your order has been placed successfully and your payment of TSH {{ payment.amount|floatformat:2 }} was received.
+    </p>
+    
+    <a href="{% url 'frontpage' %}" class="inline-flex items-center justify-center px-8 py-3.5 text-sm font-bold text-white bg-emerald-600 rounded-full hover:bg-emerald-700 transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-600 hover:-translate-y-0.5">
+        Continue Shopping
+    </a>
+</div>
