@@ -28,10 +28,9 @@ def test():
         )
         
         service = ClickPesaService()
-        result = service.initiate_mobile_money_payment(payment, "255749380797", "MPESA")
-        
-        result['payment_id'] = str(result.get('payment_id', ''))
-        print(json.dumps(result, indent=2))
+        token = service.generate_token()
+        preview = service.preview_ussd_push(token, "1000", "255749380797", str(order.id))
+        print(json.dumps(preview, indent=2))
         
     except Exception as e:
         print("Error:", str(e))
