@@ -60,3 +60,8 @@ class Cart(object):
             product = Product.objects.get(pk=product_id)
             total_cost += product.price * self.cart[str(product_id)]['quantity']
         return total_cost * 2500  # Convert USD to TSH
+
+    def clear(self):
+        # Remove cart from session
+        del self.session[settings.CART_SESSION_ID]
+        self.session.modified = True

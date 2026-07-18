@@ -116,9 +116,24 @@ def checkout(request):
         # Initiate ClickPesa Payment
         payment_phone = request.POST.get('payment_phone')
         clean_phone = payment_phone.replace('+', '').strip() if payment_phone else phone.replace('+', '').strip()
+        if clean_phone.startswith('0'):
+            clean_phone = '255' + clean_phone[1:]
         
+        # Deduce network
+        prefix = clean_phone[3:5] if clean_phone.startswith('255') else clean_phone[0:2]
+        if prefix in ['74', '75', '76']:
+            network = 'MPESA'
+        elif prefix in ['71', '65', '67', '77']:
+            network = 'TIGO_PESA'
+        elif prefix in ['78', '68', '69', '79']:
+            network = 'AIRTEL_MONEY'
+        elif prefix in ['62']:
+            network = 'HALOPESA'
+        else:
+            network = 'MPESA' # fallback
+            
         clickpesa = ClickPesaService()
-        result = clickpesa.initiate_mobile_money_payment(payment, clean_phone, payment_method)
+        result = clickpesa.initiate_mobile_money_payment(payment, clean_phone, network)
         
         if result['success']:
             messages.success(request, 'Payment initiated! Please check your phone to approve the USSD push.')
