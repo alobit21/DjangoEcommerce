@@ -340,6 +340,76 @@ def admin_order_list(request):
 
 @login_required
 @user_passes_test(is_admin)
+def admin_order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    html = f"""
+    <div class='p-3'>
+        <h5>Order #{order.order_number}</h5>
+        <p><strong>Customer:</strong> {order.user.username}</p>
+        <p><strong>Total:</strong> TSH {order.total_amount}</p>
+        <p><strong>Status:</strong> {order.status}</p>
+        <hr>
+        <h6>Items:</h6>
+        <ul>
+    """
+    for item in order.orderitem_set.all():
+        html += f"<li>{item.product.name} - {item.quantity} x TSH {item.price}</li>"
+    html += """
+        </ul>
+    </div>
+    """
+    return HttpResponse(html)
+
+@login_required
+@user_passes_test(is_admin)
+def admin_order_edit(request, order_id):
+    messages.info(request, "Order editing is under construction.")
+    return redirect('admin_order_list')
+
+@login_required
+@user_passes_test(is_admin)
+def admin_order_print(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    return HttpResponse(f"Print view for order #{order.order_number} is under construction.")
+
+@require_POST
+@login_required
+@user_passes_test(is_admin)
+def bulk_update_order_status(request):
+    try:
+        data = json.loads(request.body)
+        order_ids = data.get('order_ids', [])
+        new_status = data.get('status')
+        
+        if order_ids and new_status:
+            for order_id in order_ids:
+                order = Order.objects.get(id=order_id)
+                old_status = order.status
+                order.status = new_status
+                order.save()
+                
+                # If order is cancelled, return items to stock
+                if new_status == 'cancelled' and old_status != 'cancelled':
+                    for item in order.orderitem_set.all():
+                        stock = item.product.stock
+                        stock.quantity += item.quantity
+                        stock.save()
+                        
+                        StockTransaction.objects.create(
+                            stock=stock,
+                            transaction_type='in',
+                            quantity=item.quantity,
+                            reason=f'Order {order.order_number} cancelled',
+                            created_by=request.user
+                        )
+            
+            return JsonResponse({'success': True, 'message': f'Updated {len(order_ids)} orders to {new_status}'})
+        return JsonResponse({'success': False, 'message': 'Missing data'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=400)
+
+@login_required
+@user_passes_test(is_admin)
 def admin_stock_list(request):
     search = request.GET.get('search', '')
     category_id = request.GET.get('category', '')

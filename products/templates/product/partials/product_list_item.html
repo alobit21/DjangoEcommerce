@@ -24,13 +24,13 @@
         
         <!-- Action Buttons -->
         <div class="flex items-center gap-2.5 pt-2 mt-auto">
-            <a href="{% url 'product' product.slug %}" class="flex-grow text-center py-2.5 px-4 bg-slate-900 text-white text-xs font-semibold rounded-xl hover:bg-slate-800 transition-colors duration-200">
+            <a href="{% url 'product' product.slug %}" class="flex-grow text-center py-2.5 px-4 bg-accent text-accent-contrast text-xs font-semibold rounded-xl hover:bg-accent-hover transition-colors duration-200">
                 View Details
             </a>
             <button hx-get="{% url 'add_to_cart' product.id %}"
                     hx-target="#menu-cart-button"
                     hx-swap="outerHTML"
-                    class="p-2.5 bg-slate-50 text-slate-900 rounded-xl hover:bg-slate-900 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-900 flex items-center justify-center"
+                    class="p-2.5 bg-slate-50 text-accent rounded-xl hover:bg-accent hover:text-accent-contrast transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent flex items-center justify-center"
                     aria-label="Add {{ product.name }} to cart">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-4 h-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

@@ -75,7 +75,7 @@
 
           <!-- Real Trust Ratings -->
           <div class="flex items-center gap-1.5 pt-1">
-            <div class="flex items-center text-amber-400" aria-label="{{ product.get_rating }} out of 5 stars">
+            <div class="flex items-center text-accent" aria-label="{{ product.get_rating }} out of 5 stars">
               <span class="text-sm font-bold text-slate-900 mr-1">{{ product.get_rating|floatformat:1 }}</span>
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
@@ -100,7 +100,7 @@
           <button hx-get="{% url 'add_to_cart' product.id %}"
                   hx-target="#menu-cart-button"
                   hx-swap="outerHTML"
-                  class="w-full inline-flex items-center justify-center px-8 py-4 text-base font-bold text-white bg-slate-900 rounded-full hover:bg-slate-800 transition-all duration-200 shadow-md shadow-slate-900/10 hover:shadow-slate-900/20 focus:outline-none focus:ring-2 focus:ring-slate-900 hover:-translate-y-0.5"
+                  class="w-full inline-flex items-center justify-center px-8 py-4 text-base font-bold text-accent-contrast bg-accent rounded-full hover:bg-accent-hover transition-all duration-200 shadow-md shadow-slate-900/10 hover:shadow-slate-900/20 focus:outline-none focus:ring-2 focus:ring-accent hover:-translate-y-0.5"
                   aria-label="Add {{ product.name }} to cart">
             Add to Cart
           </button>
@@ -203,7 +203,7 @@
           <div class="flex items-center gap-4">
             <div class="text-5xl font-extrabold text-slate-900">{{ product.get_rating|floatformat:1 }}</div>
             <div>
-              <div class="flex text-amber-400">
+              <div class="flex text-accent">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
               </div>
               <p class="text-sm text-slate-500 font-medium mt-1">Based on {{ product.get_rating_count }} reviews</p>
@@ -229,7 +229,7 @@
                 <label class="block text-xs font-bold uppercase tracking-wider text-slate-800 mb-2">Review</label>
                 <textarea name="content" rows="4" class="w-full px-4 py-3 border border-slate-200 rounded-xl bg-white text-sm focus:outline-none focus:ring-2 focus:ring-slate-900" placeholder="What did you like or dislike?" required></textarea>
               </div>
-              <button type="submit" class="w-full py-3 px-6 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors">Submit Review</button>
+              <button type="submit" class="w-full py-3 px-6 bg-accent text-accent-contrast font-bold rounded-xl hover:bg-accent-hover transition-colors">Submit Review</button>
             </form>
           </div>
           {% endif %}
@@ -248,7 +248,7 @@
                   <p class="text-xs text-slate-500">{{ review.created_at|date:"F j, Y" }}</p>
                 </div>
               </div>
-              <div class="flex text-amber-400 text-xs">
+              <div class="flex text-accent text-xs">
                 ★ {{ review.rating }}/5
               </div>
             </div>

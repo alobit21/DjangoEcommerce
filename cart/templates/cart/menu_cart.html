@@ -6,7 +6,7 @@
     
     <!-- Proportional Micro-Counter Badge -->
     {% if cart|length > 0 %}
-    <span class="absolute -top-1 -right-1 w-5 h-5 bg-slate-900 text-white text-[10px] font-extrabold rounded-full flex items-center justify-center border-2 border-white shadow-sm transform group-hover:scale-110 transition-transform duration-200 select-none" aria-live="polite">
+    <span class="absolute -top-1 -right-1 w-5 h-5 bg-accent text-accent-contrast text-[10px] font-extrabold rounded-full flex items-center justify-center border-2 border-white shadow-sm transform group-hover:scale-110 transition-transform duration-200 select-none" aria-live="polite">
         {{ cart|length }}
     </span>
     {% endif %}

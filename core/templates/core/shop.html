@@ -58,13 +58,13 @@
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">Categories</h3>
           <ul class="space-y-2.5 text-sm" aria-label="Product categories">
             <li>
-              <a href="{% url 'shop' %}" class="block py-1 transition-colors {% if not active_category %}text-slate-900 font-bold border-l-2 border-slate-900 pl-3 -ml-3.5{% else %}text-slate-500 hover:text-slate-900{% endif %}">
+              <a href="{% url 'shop' %}" class="block py-1 transition-colors {% if not active_category %}text-accent font-bold border-l-2 border-accent pl-3 -ml-3.5{% else %}text-slate-500 hover:text-slate-900{% endif %}">
                 All Products
               </a>
             </li>
             {% for category in categories %}
             <li>
-              <a href="{% url 'shop' %}?category={{ category.slug }}" class="block py-1 transition-colors {% if category.slug == active_category %}text-slate-900 font-bold border-l-2 border-slate-900 pl-3 -ml-3.5{% else %}text-slate-500 hover:text-slate-900{% endif %}">
+              <a href="{% url 'shop' %}?category={{ category.slug }}" class="block py-1 transition-colors {% if category.slug == active_category %}text-accent font-bold border-l-2 border-accent pl-3 -ml-3.5{% else %}text-slate-500 hover:text-slate-900{% endif %}">
                 {{ category.name }}
               </a>
             </li>
@@ -102,7 +102,7 @@
             <p class="text-sm text-slate-500 max-w-sm mb-8 leading-relaxed">
               We couldn't find any products matching your query. Try adjusting your search term or selection categories.
             </p>
-            <a href="{% url 'shop' %}" class="inline-flex items-center px-6 py-2.5 bg-slate-900 text-white text-xs font-semibold rounded-full hover:bg-slate-800 transition-colors shadow-sm">
+            <a href="{% url 'shop' %}" class="inline-flex items-center px-6 py-2.5 bg-accent text-accent-contrast text-xs font-semibold rounded-full hover:bg-accent-hover transition-colors shadow-sm">
               Reset All Filters
             </a>
           </div>
@@ -149,13 +149,13 @@
       <h3 class="text-xs font-bold uppercase tracking-wider text-slate-900">Categories</h3>
       <ul class="space-y-3 text-base" aria-label="Product categories">
         <li>
-          <a href="{% url 'shop' %}" class="block py-1.5 transition-colors {% if not active_category %}text-slate-900 font-bold border-l-2 border-slate-900 pl-3 -ml-3.5{% else %}text-slate-500{% endif %}">
+          <a href="{% url 'shop' %}" class="block py-1.5 transition-colors {% if not active_category %}text-accent font-bold border-l-2 border-accent pl-3 -ml-3.5{% else %}text-slate-500{% endif %}">
             All Products
           </a>
         </li>
         {% for category in categories %}
         <li>
-          <a href="{% url 'shop' %}?category={{ category.slug }}" class="block py-1.5 transition-colors {% if category.slug == active_category %}text-slate-900 font-bold border-l-2 border-slate-900 pl-3 -ml-3.5{% else %}text-slate-500{% endif %}">
+          <a href="{% url 'shop' %}?category={{ category.slug }}" class="block py-1.5 transition-colors {% if category.slug == active_category %}text-accent font-bold border-l-2 border-accent pl-3 -ml-3.5{% else %}text-slate-500{% endif %}">
             {{ category.name }}
           </a>
         </li>

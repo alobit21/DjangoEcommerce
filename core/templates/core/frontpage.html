@@ -11,7 +11,7 @@
             <div class="space-y-8 lg:max-w-xl">
                 <!-- Premium Badge -->
                 <div>
-                    <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase bg-slate-900 text-white">
+                    <span class="inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wider uppercase bg-accent text-accent-contrast">
                         New Season 2024
                     </span>
                 </div>
@@ -29,7 +29,7 @@
                 
                 <!-- Action Buttons -->
                 <div class="flex flex-wrap gap-4 pt-2">
-                    <a href="{% url 'shop' %}" class="inline-flex items-center justify-center px-8 py-3.5 text-sm font-semibold text-white bg-slate-900 rounded-full hover:bg-slate-800 transition-all duration-200 shadow-md shadow-slate-900/10 hover:shadow-slate-900/20 hover:-translate-y-0.5">
+                    <a href="{% url 'shop' %}" class="inline-flex items-center justify-center px-8 py-3.5 text-sm font-semibold text-accent-contrast bg-accent rounded-full hover:bg-accent-hover transition-all duration-200 shadow-md shadow-slate-900/10 hover:shadow-slate-900/20 hover:-translate-y-0.5">
                         Shop Now
                     </a>
                     <a href="{% url 'shop' %}" class="inline-flex items-center justify-center px-8 py-3.5 text-sm font-semibold text-slate-700 bg-white border border-slate-200 rounded-full hover:border-slate-300 hover:text-slate-900 transition-all duration-200 hover:-translate-y-0.5 shadow-sm">
@@ -112,7 +112,7 @@
                 <img src="{{ product.get_thumbnail }}" 
                      class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500 ease-out" 
                      alt="{{ product.name }}">
-                <span class="absolute top-4 left-4 bg-slate-900 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                <span class="absolute top-4 left-4 bg-accent text-accent-contrast text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                     Featured
                 </span>
             </div>
@@ -132,13 +132,13 @@
                 
                 <!-- Action Tray -->
                 <div class="flex items-center gap-3 pt-2">
-                    <a href="{% url 'product' product.slug %}" class="flex-grow text-center py-3 px-4 bg-slate-900 text-white text-xs font-semibold rounded-xl hover:bg-slate-800 transition-colors duration-200">
+                    <a href="{% url 'product' product.slug %}" class="flex-grow text-center py-3 px-4 bg-accent text-accent-contrast text-xs font-semibold rounded-xl hover:bg-accent-hover transition-colors duration-200">
                         View Details
                     </a>
                     <button hx-get="{% url 'add_to_cart' product.id %}"
                             hx-target="#menu-cart-button"
                             hx-swap="outerHTML"
-                            class="p-3.5 bg-slate-50 text-slate-900 rounded-xl hover:bg-slate-900 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-slate-900 flex items-center justify-center"
+                            class="p-3.5 bg-slate-50 text-accent rounded-xl hover:bg-accent hover:text-accent-contrast transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-accent flex items-center justify-center"
                             aria-label="Add {{ product.name }} to cart">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="currentColor" class="w-5 h-5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -219,7 +219,7 @@
                 </div>
 
                 <div class="pt-4">
-                    <a href="{% url 'shop' %}" class="inline-flex items-center px-8 py-3.5 bg-slate-900 text-white font-semibold rounded-full hover:bg-slate-800 transition-colors shadow-md hover:shadow-lg">
+                    <a href="{% url 'shop' %}" class="inline-flex items-center px-8 py-3.5 bg-accent text-accent-contrast font-semibold rounded-full hover:bg-accent-hover transition-colors shadow-md hover:shadow-lg">
                         Explore Now
                         <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -253,7 +253,7 @@
 
                     <!-- Slide Controls -->
                     <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2">
-                        <button class="w-2.5 h-2.5 rounded-full transition-all duration-300 bg-slate-900" data-slide-index="1" aria-label="Show slide 1"></button>
+                        <button class="w-2.5 h-2.5 rounded-full transition-all duration-300 bg-accent" data-slide-index="1" aria-label="Show slide 1"></button>
                         <button class="w-2.5 h-2.5 rounded-full transition-all duration-300 bg-slate-200" data-slide-index="2" aria-label="Show slide 2"></button>
                         <button class="w-2.5 h-2.5 rounded-full transition-all duration-300 bg-slate-200" data-slide-index="3" aria-label="Show slide 3"></button>
                         <button class="w-2.5 h-2.5 rounded-full transition-all duration-300 bg-slate-200" data-slide-index="4" aria-label="Show slide 4"></button>
@@ -293,14 +293,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hide current
         slides[currentIndex].classList.remove('opacity-100', 'active-slide');
         slides[currentIndex].classList.add('opacity-0');
-        dots[currentIndex].classList.remove('bg-slate-900');
+        dots[currentIndex].classList.remove('bg-accent');
         dots[currentIndex].classList.add('bg-slate-200');
 
         // Show next
         slides[nextIndex].classList.remove('opacity-0');
         slides[nextIndex].classList.add('opacity-100', 'active-slide');
         dots[nextIndex].classList.remove('bg-slate-200');
-        dots[nextIndex].classList.add('bg-slate-900');
+        dots[nextIndex].classList.add('bg-accent');
 
         currentIndex = nextIndex;
     }
